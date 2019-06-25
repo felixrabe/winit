@@ -81,7 +81,7 @@ use {
     WindowEvent,
     WindowId as RootEventId,
 };
-use events::{Touch, TouchPhase};
+use event::{Touch, TouchPhase};
 use window::MonitorHandle as RootMonitorHandle;
 
 mod ffi;

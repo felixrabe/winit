@@ -120,7 +120,7 @@ extern crate percent_encoding;
 extern crate smithay_client_toolkit as sctk;
 
 pub(crate) use dpi::*; // TODO: Actually change the imports throughout the codebase.
-pub use events::*;
+pub use event::*;
 pub use window::{AvailableMonitorsIter, MonitorHandle};
 pub use icon::*;
 

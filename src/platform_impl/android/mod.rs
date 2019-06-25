@@ -23,7 +23,7 @@ use {
     WindowId as RootWindowId,
 };
 use CreationError::OsError;
-use events::{Touch, TouchPhase};
+use event::{Touch, TouchPhase};
 use window::MonitorHandle as RootMonitorHandle;
 
 pub struct EventLoop {

@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use {ElementState, MouseButton, MouseScrollDelta, TouchPhase, WindowEvent};
-use events::ModifiersState;
+use event::ModifiersState;
 
 use super::DeviceId;
 use super::event_loop::EventLoopSink;

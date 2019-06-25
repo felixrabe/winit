@@ -1,7 +1,7 @@
 //! The `EventLoop` struct and assorted supporting types, including `ControlFlow`.
 
 use platform_impl;
-use events::Event;
+use event::Event;
 use {AvailableMonitorsIter, MonitorHandle};
 
 /// Provides a way to retrieve events from the system and from the windows that were registered to

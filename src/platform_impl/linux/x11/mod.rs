@@ -36,7 +36,7 @@ use {
     WindowAttributes,
     WindowEvent,
 };
-use events::ModifiersState;
+use event::ModifiersState;
 use platform::PlatformSpecificWindowBuilderAttributes;
 use self::dnd::{Dnd, DndState};
 use self::ime::{ImeReceiver, ImeSender, ImeCreationError, Ime};
@@ -586,7 +586,7 @@ impl EventLoop {
             }
 
             ffi::KeyPress | ffi::KeyRelease => {
-                use events::ElementState::{Pressed, Released};
+                use event::ElementState::{Pressed, Released};
 
                 // Note that in compose/pre-edit sequences, this will always be Released.
                 let state = if xev.get_type() == ffi::KeyPress {
@@ -627,7 +627,7 @@ impl EventLoop {
                         self.xconn.check_errors().expect("Failed to lookup keysym");
                         keysym
                     };
-                    let virtual_keycode = events::keysym_to_element(keysym as c_uint);
+                    let virtual_keycode = event::keysym_to_element(keysym as c_uint);
 
                     callback(Event::WindowEvent {
                         window_id,
@@ -667,11 +667,11 @@ impl EventLoop {
                     return;
                 }
 
-                use events::WindowEvent::{Focused, CursorEntered, MouseInput, CursorLeft, CursorMoved, MouseWheel, AxisMotion};
-                use events::ElementState::{Pressed, Released};
-                use events::MouseButton::{Left, Right, Middle, Other};
-                use events::MouseScrollDelta::LineDelta;
-                use events::{Touch, TouchPhase};
+                use event::WindowEvent::{Focused, CursorEntered, MouseInput, CursorLeft, CursorMoved, MouseWheel, AxisMotion};
+                use event::ElementState::{Pressed, Released};
+                use event::MouseButton::{Left, Right, Middle, Other};
+                use event::MouseScrollDelta::LineDelta;
+                use event::{Touch, TouchPhase};
 
                 match xev.evtype {
                     ffi::XI_ButtonPress | ffi::XI_ButtonRelease => {
@@ -1066,7 +1066,7 @@ impl EventLoop {
                         };
                         self.xconn.check_errors().expect("Failed to lookup raw keysym");
 
-                        let virtual_keycode = events::keysym_to_element(keysym as c_uint);
+                        let virtual_keycode = event::keysym_to_element(keysym as c_uint);
 
                         callback(Event::DeviceEvent {
                             device_id: mkdid(device_id),
