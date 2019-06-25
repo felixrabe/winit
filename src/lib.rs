@@ -126,7 +126,7 @@ pub use icon::*;
 
 pub mod dpi;
 pub mod event_loop;
-mod events;
+mod event;
 mod icon;
 mod platform_impl;
 mod window;

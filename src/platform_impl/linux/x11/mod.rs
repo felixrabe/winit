@@ -1,7 +1,7 @@
 #![cfg(any(target_os = "linux", target_os = "dragonfly", target_os = "freebsd", target_os = "netbsd", target_os = "openbsd"))]
 
 pub mod ffi;
-mod events;
+mod event;
 mod monitor;
 mod window;
 mod xdisplay;
