@@ -117,7 +117,7 @@ impl EventLoop {
             sink: sink.clone(),
             store: store.clone(),
             seats: seats.clone(),
-            event_loop_proxy: EventsLoopProxy {
+            event_loop_proxy: EventLoopProxy {
                 display: Arc::downgrade(&display),
                 pending_wakeup: Arc::downgrade(&pending_wakeup),
             },
@@ -392,7 +392,7 @@ struct SeatData {
     keyboard: Option<Proxy<wl_keyboard::WlKeyboard>>,
     touch: Option<Proxy<wl_touch::WlTouch>>,
 <<<<<<< HEAD
-    event_loop_proxy: EventsLoopProxy,
+    event_loop_proxy: EventLoopProxy,
     modifiers_tracker: Arc<Mutex<ModifiersState>>,
 =======
     event_loop_proxy: EventLoopProxy,

@@ -140,7 +140,7 @@ impl Window {
         pl_attribs: PlatformSpecificWindowBuilderAttributes,
     ) -> Result<Self, CreationError> {
         match *event_loop {
-            EventsLoop::Wayland(ref event_loop) => {
+            EventLoop::Wayland(ref event_loop) => {
                 wayland::Window::new(event_loop, attribs, pl_attribs).map(Window::Wayland)
             },
             EventLoop::X(ref event_loop) => {
