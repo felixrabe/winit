@@ -1,7 +1,7 @@
 extern crate winit;
 
 fn main() {
-    let mut event_loop = winit::event_loop::EventsLoop::new();
+    let mut event_loop = winit::event_loop::EventLoop::new();
 
     let mut resizable = false;
 

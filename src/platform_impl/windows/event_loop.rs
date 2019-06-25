@@ -42,7 +42,7 @@ use winapi::um::winnt::{LONG, LPCSTR, SHORT};
 use {
     ControlFlow,
     Event,
-    EventsLoopClosed,
+    EventLoopClosed,
     KeyboardInput,
     LogicalPosition,
     LogicalSize,
@@ -80,27 +80,27 @@ impl Inserter {
     }
 }
 
-pub struct EventsLoop {
+pub struct EventLoop {
     thread_msg_target: HWND,
     // Id of the background thread from the Win32 API.
     thread_id: DWORD,
     // Receiver for the events. The sender is in the background thread.
-    receiver: mpsc::Receiver<EventsLoopEvent>,
-    // Sender instance that's paired with the receiver. Used to construct an `EventsLoopProxy`.
-    sender: mpsc::Sender<EventsLoopEvent>,
+    receiver: mpsc::Receiver<EventLoopEvent>,
+    // Sender instance that's paired with the receiver. Used to construct an `EventLoopProxy`.
+    sender: mpsc::Sender<EventLoopEvent>,
 }
 
-enum EventsLoopEvent {
+enum EventLoopEvent {
     WinitEvent(Event),
     Panic(PanicError),
 }
 
-impl EventsLoop {
-    pub fn new() -> EventsLoop {
+impl EventLoop {
+    pub fn new() -> EventLoop {
         Self::with_dpi_awareness(true)
     }
 
-    pub fn with_dpi_awareness(dpi_aware: bool) -> EventsLoop {
+    pub fn with_dpi_awareness(dpi_aware: bool) -> EventLoop {
         struct InitData {
             thread_msg_target: HWND,
         }
@@ -152,7 +152,7 @@ impl EventsLoop {
                                  .and_then(|s| s.panic_error.take())
                         );
                         if let Some(panic_payload) = panic_payload_opt {
-                            panic_sender.send(EventsLoopEvent::Panic(panic_payload)).unwrap();
+                            panic_sender.send(EventLoopEvent::Panic(panic_payload)).unwrap();
                         };
 
                         // Only happens if the message is `WM_QUIT`.
@@ -175,7 +175,7 @@ impl EventsLoop {
             processthreadsapi::GetThreadId(handle)
         };
 
-        EventsLoop {
+        EventLoop {
             thread_msg_target,
             thread_id,
             receiver: rx,
@@ -188,8 +188,8 @@ impl EventsLoop {
     {
         loop {
             let event = match self.receiver.try_recv() {
-                Ok(EventsLoopEvent::WinitEvent(e)) => e,
-                Ok(EventsLoopEvent::Panic(panic)) => {
+                Ok(EventLoopEvent::WinitEvent(e)) => e,
+                Ok(EventLoopEvent::Panic(panic)) => {
                     eprintln!("resuming child thread unwind at: {:?}", Backtrace::new());
                     panic::resume_unwind(panic)
                 },
@@ -205,8 +205,8 @@ impl EventsLoop {
     {
         loop {
             let event = match self.receiver.recv() {
-                Ok(EventsLoopEvent::WinitEvent(e)) => e,
-                Ok(EventsLoopEvent::Panic(panic)) => {
+                Ok(EventLoopEvent::WinitEvent(e)) => e,
+                Ok(EventLoopEvent::Panic(panic)) => {
                     eprintln!("resuming child thread unwind at: {:?}", Backtrace::new());
                     panic::resume_unwind(panic)
                 },
@@ -221,8 +221,8 @@ impl EventsLoop {
         }
     }
 
-    pub fn create_proxy(&self) -> EventsLoopProxy {
-        EventsLoopProxy {
+    pub fn create_proxy(&self) -> EventLoopProxy {
+        EventLoopProxy {
             thread_id: self.thread_id,
             thread_msg_target: self.thread_msg_target,
             sender: self.sender.clone(),
@@ -243,7 +243,7 @@ impl EventsLoop {
     }
 }
 
-impl Drop for EventsLoop {
+impl Drop for EventLoop {
     fn drop(&mut self) {
         unsafe {
             // Posting `WM_QUIT` will cause `GetMessage` to stop.
@@ -253,18 +253,18 @@ impl Drop for EventsLoop {
 }
 
 #[derive(Clone)]
-pub struct EventsLoopProxy {
+pub struct EventLoopProxy {
     thread_id: DWORD,
     thread_msg_target: HWND,
-    sender: mpsc::Sender<EventsLoopEvent>,
+    sender: mpsc::Sender<EventLoopEvent>,
 }
 
-unsafe impl Send for EventsLoopProxy {}
-unsafe impl Sync for EventsLoopProxy {}
+unsafe impl Send for EventLoopProxy {}
+unsafe impl Sync for EventLoopProxy {}
 
-impl EventsLoopProxy {
-    pub fn wakeup(&self) -> Result<(), EventsLoopClosed> {
-        self.sender.send(EventsLoopEvent::WinitEvent(Event::Awakened)).map_err(|_| EventsLoopClosed)
+impl EventLoopProxy {
+    pub fn wakeup(&self) -> Result<(), EventLoopClosed> {
+        self.sender.send(EventLoopEvent::WinitEvent(Event::Awakened)).map_err(|_| EventLoopClosed)
     }
 
     /// Executes a function in the background thread.
@@ -392,7 +392,7 @@ fn thread_event_target_window() -> HWND {
 // in a thread-local variable.
 thread_local!(static CONTEXT_STASH: RefCell<Option<ThreadLocalData>> = RefCell::new(None));
 struct ThreadLocalData {
-    sender: mpsc::Sender<EventsLoopEvent>,
+    sender: mpsc::Sender<EventLoopEvent>,
     windows: HashMap<HWND, Arc<Mutex<WindowState>>>,
     file_drop_handlers: HashMap<HWND, FileDropHandler>, // Each window has its own drop handler.
     mouse_buttons_down: u32,
@@ -405,7 +405,7 @@ pub fn send_event(event: Event) {
     CONTEXT_STASH.with(|context_stash| {
         let context_stash = context_stash.borrow();
 
-        let _ = context_stash.as_ref().unwrap().sender.send(EventsLoopEvent::WinitEvent(event));   // Ignoring if closed
+        let _ = context_stash.as_ref().unwrap().sender.send(EventLoopEvent::WinitEvent(event));   // Ignoring if closed
     });
 }
 
@@ -603,7 +603,7 @@ unsafe fn callback_inner(
                     }
                 }
 
-                cstash.sender.send(EventsLoopEvent::WinitEvent(event)).ok();
+                cstash.sender.send(EventLoopEvent::WinitEvent(event)).ok();
             });
             0
         },

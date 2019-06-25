@@ -3,7 +3,7 @@
 use winapi;
 use winapi::shared::windef::HWND;
 
-pub use self::event_loop::{EventsLoop, EventsLoopProxy};
+pub use self::event_loop::{EventLoop, EventLoopProxy};
 pub use self::monitor::MonitorHandle;
 pub use self::window::Window;
 

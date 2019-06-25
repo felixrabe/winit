@@ -4,8 +4,8 @@ fn needs_send<T:Send>() {}
 
 #[test]
 fn event_loop_proxy_send() {
-    // ensures that `winit::event_loop::EventsLoopProxy` implements `Send`
-    needs_send::<winit::event_loop::EventsLoopProxy>();
+    // ensures that `winit::event_loop::EventLoopProxy` implements `Send`
+    needs_send::<winit::event_loop::EventLoopProxy>();
 }
 
 #[test]

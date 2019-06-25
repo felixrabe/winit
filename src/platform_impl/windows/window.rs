@@ -28,7 +28,7 @@ use {
 };
 use platform_impl::platform::{PlatformSpecificWindowBuilderAttributes, WindowId};
 use platform_impl::platform::dpi::{dpi_to_scale_factor, get_hwnd_dpi};
-use platform_impl::platform::event_loop::{self, EventsLoop, DESTROY_MSG_ID, INITIAL_DPI_MSG_ID};
+use platform_impl::platform::event_loop::{self, EventLoop, DESTROY_MSG_ID, INITIAL_DPI_MSG_ID};
 use platform_impl::platform::icon::{self, IconType, WinIcon};
 use platform_impl::platform::monitor::get_available_monitors;
 use platform_impl::platform::raw_input::register_all_mice_and_keyboards_for_raw_input;
@@ -44,12 +44,12 @@ pub struct Window {
     window_state: Arc<Mutex<WindowState>>,
 
     // The events loop proxy.
-    event_loop_proxy: event_loop::EventsLoopProxy,
+    event_loop_proxy: event_loop::EventLoopProxy,
 }
 
 impl Window {
     pub fn new(
-        event_loop: &EventsLoop,
+        event_loop: &EventLoop,
         w_attr: WindowAttributes,
         pl_attr: PlatformSpecificWindowBuilderAttributes,
     ) -> Result<Window, CreationError> {
@@ -448,7 +448,7 @@ impl Window {
     #[inline]
     pub fn get_current_monitor(&self) -> RootMonitorHandle {
         RootMonitorHandle {
-            inner: EventsLoop::get_current_monitor(self.window.0),
+            inner: EventLoop::get_current_monitor(self.window.0),
         }
     }
 
@@ -527,7 +527,7 @@ unsafe fn init(
     mut attributes: WindowAttributes,
     mut pl_attribs: PlatformSpecificWindowBuilderAttributes,
     inserter: event_loop::Inserter,
-    event_loop_proxy: event_loop::EventsLoopProxy,
+    event_loop_proxy: event_loop::EventLoopProxy,
 ) -> Result<Window, CreationError> {
     let title = OsStr::new(&attributes.title)
         .encode_wide()

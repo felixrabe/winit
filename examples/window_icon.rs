@@ -13,7 +13,7 @@ fn main() {
 
     let icon = load_icon(Path::new(path));
 
-    let mut event_loop = winit::event_loop::EventsLoop::new();
+    let mut event_loop = winit::event_loop::EventLoop::new();
 
     let window = winit::WindowBuilder::new()
         .with_title("An iconic window!")

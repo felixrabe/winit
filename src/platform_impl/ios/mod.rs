@@ -199,21 +199,21 @@ impl MonitorHandle {
     }
 }
 
-pub struct EventsLoop {
+pub struct EventLoop {
     events_queue: Arc<RefCell<VecDeque<Event>>>,
 }
 
 #[derive(Clone)]
-pub struct EventsLoopProxy;
+pub struct EventLoopProxy;
 
-impl EventsLoop {
-    pub fn new() -> EventsLoop {
+impl EventLoop {
+    pub fn new() -> EventLoop {
         unsafe {
             if !msg_send![class!(NSThread), isMainThread] {
-                panic!("`EventsLoop` can only be created on the main thread on iOS");
+                panic!("`EventLoop` can only be created on the main thread on iOS");
             }
         }
-        EventsLoop { events_queue: Default::default() }
+        EventLoop { events_queue: Default::default() }
     }
 
     #[inline]
@@ -238,7 +238,7 @@ impl EventsLoop {
 
         unsafe {
             // jump hack, so we won't quit on willTerminate event before processing it
-            assert!(JMPBUF.is_some(), "`EventsLoop::poll_events` must be called after window creation on iOS");
+            assert!(JMPBUF.is_some(), "`EventLoop::poll_events` must be called after window creation on iOS");
             if setjmp(mem::transmute_copy(&mut JMPBUF)) != 0 {
                 if let Some(event) = self.events_queue.borrow_mut().pop_front() {
                     callback(event);
@@ -276,13 +276,13 @@ impl EventsLoop {
         }
     }
 
-    pub fn create_proxy(&self) -> EventsLoopProxy {
-        EventsLoopProxy
+    pub fn create_proxy(&self) -> EventLoopProxy {
+        EventLoopProxy
     }
 }
 
-impl EventsLoopProxy {
-    pub fn wakeup(&self) -> Result<(), ::EventsLoopClosed> {
+impl EventLoopProxy {
+    pub fn wakeup(&self) -> Result<(), ::EventLoopClosed> {
         unimplemented!()
     }
 }
@@ -322,7 +322,7 @@ impl Default for PlatformSpecificWindowBuilderAttributes {
 // so to be consistent with other platforms we have to change that.
 impl Window {
     pub fn new(
-        ev: &EventsLoop,
+        ev: &EventLoop,
         _attributes: WindowAttributes,
         pl_attributes: PlatformSpecificWindowBuilderAttributes,
     ) -> Result<Window, CreationError> {

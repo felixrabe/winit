@@ -6,7 +6,7 @@ use winapi::um::winuser;
 use std::{mem, ptr};
 use std::collections::VecDeque;
 
-use super::{EventsLoop, util};
+use super::{EventLoop, util};
 use dpi::{PhysicalPosition, PhysicalSize};
 use platform_impl::platform::dpi::{dpi_to_scale_factor, get_monitor_dpi};
 use platform_impl::platform::window::Window;
@@ -71,7 +71,7 @@ pub fn get_primary_monitor() -> MonitorHandle {
     MonitorHandle::from_hmonitor(hmonitor)
 }
 
-impl EventsLoop {
+impl EventLoop {
     // TODO: Investigate opportunities for caching
     pub fn get_available_monitors(&self) -> VecDeque<MonitorHandle> {
         get_available_monitors()

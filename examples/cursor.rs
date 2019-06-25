@@ -3,7 +3,7 @@ extern crate winit;
 use winit::{Event, ElementState, MouseCursor, WindowEvent, KeyboardInput, event_loop::ControlFlow};
 
 fn main() {
-    let mut event_loop = winit::event_loop::EventsLoop::new();
+    let mut event_loop = winit::event_loop::EventLoop::new();
 
     let window = winit::WindowBuilder::new().build(&event_loop).unwrap();
     window.set_title("A fantastic window!");
