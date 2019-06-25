@@ -117,7 +117,7 @@ impl EventLoop {
             sink: sink.clone(),
             store: store.clone(),
             seats: seats.clone(),
-            events_loop_proxy: EventsLoopProxy {
+            event_loop_proxy: EventsLoopProxy {
                 display: Arc::downgrade(&display),
                 pending_wakeup: Arc::downgrade(&pending_wakeup),
             },
@@ -307,7 +307,7 @@ impl SeatManager {
             pointer: None,
             keyboard: None,
             touch: None,
-            events_loop_proxy: self.events_loop_proxy.clone(),
+            event_loop_proxy: self.event_loop_proxy.clone(),
             modifiers_tracker: Arc::new(Mutex::new(ModifiersState::default())),
         };
         let seat = registry
@@ -339,7 +339,7 @@ impl SeatManager {
                     pointer: None,
                     keyboard: None,
                     touch: None,
-                    events_loop_proxy: self.events_loop_proxy.clone(),
+                    event_loop_proxy: self.event_loop_proxy.clone(),
                     modifiers_tracker: Arc::new(Mutex::new(ModifiersState::default())),
                 };
                 let seat = registry
@@ -361,7 +361,7 @@ impl SeatManager {
                         touch: None,
                         event_loop_proxy: self.event_loop_proxy.clone(),
                     });
->>>>>>> Change instances of "events_loop" to "event_loop"
+>>>>>>> Change instances of "event_loop" to "event_loop"
                 self.store.lock().unwrap().new_seat(&seat);
                 self.seats.lock().unwrap().push((id, seat));
             }
@@ -392,11 +392,11 @@ struct SeatData {
     keyboard: Option<Proxy<wl_keyboard::WlKeyboard>>,
     touch: Option<Proxy<wl_touch::WlTouch>>,
 <<<<<<< HEAD
-    events_loop_proxy: EventsLoopProxy,
+    event_loop_proxy: EventsLoopProxy,
     modifiers_tracker: Arc<Mutex<ModifiersState>>,
 =======
     event_loop_proxy: EventLoopProxy,
->>>>>>> Change instances of "events_loop" to "event_loop"
+>>>>>>> Change instances of "event_loop" to "event_loop"
 }
 
 impl SeatData {
@@ -428,11 +428,11 @@ impl SeatData {
                         &seat,
                         self.sink.clone(),
 <<<<<<< HEAD
-                        self.events_loop_proxy.clone(),
+                        self.event_loop_proxy.clone(),
                         self.modifiers_tracker.clone(),
 =======
                         self.event_loop_proxy.clone(),
->>>>>>> Change instances of "events_loop" to "event_loop"
+>>>>>>> Change instances of "event_loop" to "event_loop"
                     ))
                 }
                 // destroy keyboard if applicable
