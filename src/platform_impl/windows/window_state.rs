@@ -2,7 +2,7 @@ use {MouseCursor, WindowAttributes};
 use std::{io, ptr};
 use std::sync::MutexGuard;
 use dpi::LogicalSize;
-use platform_impl::platform::{util, events_loop};
+use platform_impl::platform::{util, event_loop};
 use platform_impl::platform::icon::WinIcon;
 use winapi::shared::windef::{RECT, HWND};
 use winapi::shared::minwindef::DWORD;
@@ -265,7 +265,7 @@ impl WindowFlags {
             let (style, style_ex) = new.to_window_styles();
 
             unsafe {
-                winuser::SendMessageW(window, *events_loop::SET_RETAIN_STATE_ON_SIZE_MSG_ID, 1, 0);
+                winuser::SendMessageW(window, *event_loop::SET_RETAIN_STATE_ON_SIZE_MSG_ID, 1, 0);
 
                 winuser::SetWindowLongW(window, winuser::GWL_STYLE, style as _);
                 winuser::SetWindowLongW(window, winuser::GWL_EXSTYLE, style_ex as _);
@@ -299,7 +299,7 @@ impl WindowFlags {
                         );
                     }
                 }
-                winuser::SendMessageW(window, *events_loop::SET_RETAIN_STATE_ON_SIZE_MSG_ID, 0, 0);
+                winuser::SendMessageW(window, *event_loop::SET_RETAIN_STATE_ON_SIZE_MSG_ID, 0, 0);
             }
         }
     }

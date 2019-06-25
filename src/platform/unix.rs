@@ -120,7 +120,7 @@ impl EventsLoopExt for EventsLoop {
     fn new_x11() -> Result<Self, XNotSupported> {
         LinuxEventsLoop::new_x11().map(|ev|
             EventsLoop {
-                events_loop: ev,
+                event_loop: ev,
                 _marker: ::std::marker::PhantomData,
             }
         )
@@ -129,7 +129,7 @@ impl EventsLoopExt for EventsLoop {
     #[inline]
     fn new_wayland() -> Self {
         EventsLoop {
-            events_loop: match LinuxEventsLoop::new_wayland() {
+            event_loop: match LinuxEventsLoop::new_wayland() {
                 Ok(e) => e,
                 Err(_) => panic!()      // TODO: propagate
             },
@@ -139,18 +139,18 @@ impl EventsLoopExt for EventsLoop {
 
     #[inline]
     fn is_wayland(&self) -> bool {
-        self.events_loop.is_wayland()
+        self.event_loop.is_wayland()
     }
 
     #[inline]
     fn is_x11(&self) -> bool {
-        !self.events_loop.is_wayland()
+        !self.event_loop.is_wayland()
     }
 
     #[inline]
     #[doc(hidden)]
     fn get_xlib_xconnection(&self) -> Option<Arc<XConnection>> {
-        self.events_loop.x_connection().cloned()
+        self.event_loop.x_connection().cloned()
     }
 }
 

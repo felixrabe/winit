@@ -14,7 +14,7 @@ use {ElementState, KeyboardInput, ModifiersState, VirtualKeyCode, WindowEvent};
 pub fn init_keyboard(
     seat: &Proxy<wl_seat::WlSeat>,
     sink: Arc<Mutex<EventsLoopSink>>,
-    events_loop_proxy: EventsLoopProxy,
+    event_loop_proxy: EventsLoopProxy,
     modifiers_tracker: Arc<Mutex<ModifiersState>>,
 ) -> Proxy<wl_keyboard::WlKeyboard> {
     // { variables to be captured by the closures
@@ -108,7 +108,7 @@ pub fn init_keyboard(
                         guard.send_event(WindowEvent::ReceivedCharacter(chr), wid);
                     }
                 }
-                events_loop_proxy.wakeup().unwrap();
+                event_loop_proxy.wakeup().unwrap();
             }
         },
     );

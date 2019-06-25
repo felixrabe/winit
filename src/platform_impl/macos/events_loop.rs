@@ -1,4 +1,4 @@
-use {events_loop::ControlFlow, events_loop::EventsLoopClosed};
+use {event_loop::ControlFlow, event_loop::EventsLoopClosed};
 use cocoa::{self, appkit, foundation};
 use cocoa::appkit::{NSApplication, NSEvent, NSEventMask, NSEventModifierFlags, NSEventPhase, NSView, NSWindow};
 use events::{self, ElementState, Event, TouchPhase, WindowEvent, DeviceEvent, ModifiersState, KeyboardInput};

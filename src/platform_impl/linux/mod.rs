@@ -135,16 +135,16 @@ impl MonitorHandle {
 impl Window {
     #[inline]
     pub fn new(
-        events_loop: &EventsLoop,
+        event_loop: &EventsLoop,
         attribs: WindowAttributes,
         pl_attribs: PlatformSpecificWindowBuilderAttributes,
     ) -> Result<Self, CreationError> {
-        match *events_loop {
-            EventsLoop::Wayland(ref events_loop) => {
-                wayland::Window::new(events_loop, attribs, pl_attribs).map(Window::Wayland)
+        match *event_loop {
+            EventsLoop::Wayland(ref event_loop) => {
+                wayland::Window::new(event_loop, attribs, pl_attribs).map(Window::Wayland)
             },
-            EventsLoop::X(ref events_loop) => {
-                x11::Window::new(events_loop, attribs, pl_attribs).map(Window::X)
+            EventsLoop::X(ref event_loop) => {
+                x11::Window::new(event_loop, attribs, pl_attribs).map(Window::X)
             },
         }
     }

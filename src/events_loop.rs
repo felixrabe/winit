@@ -18,7 +18,7 @@ use {AvailableMonitorsIter, MonitorHandle};
 /// `Window` created from this `EventsLoop` _can_ be sent to an other thread, and the
 /// `EventsLoopProxy` allows you to wakeup an `EventsLoop` from an other thread.
 pub struct EventsLoop {
-    pub(crate) events_loop: platform_impl::EventsLoop,
+    pub(crate) event_loop: platform_impl::EventsLoop,
     _marker: ::std::marker::PhantomData<*mut ()> // Not Send nor Sync
 }
 
@@ -49,7 +49,7 @@ impl EventsLoop {
     /// fallback on x11. If this variable is set with any other value, winit will panic.
     pub fn new() -> EventsLoop {
         EventsLoop {
-            events_loop: platform_impl::EventsLoop::new(),
+            event_loop: platform_impl::EventsLoop::new(),
             _marker: ::std::marker::PhantomData,
         }
     }
@@ -59,14 +59,14 @@ impl EventsLoop {
     // Note: should be replaced with `-> impl Iterator` once stable.
     #[inline]
     pub fn get_available_monitors(&self) -> AvailableMonitorsIter {
-        let data = self.events_loop.get_available_monitors();
+        let data = self.event_loop.get_available_monitors();
         AvailableMonitorsIter{ data: data.into_iter() }
     }
 
     /// Returns the primary monitor of the system.
     #[inline]
     pub fn get_primary_monitor(&self) -> MonitorHandle {
-        MonitorHandle { inner: self.events_loop.get_primary_monitor() }
+        MonitorHandle { inner: self.event_loop.get_primary_monitor() }
     }
 
     /// Fetches all the events that are pending, calls the callback function for each of them,
@@ -75,7 +75,7 @@ impl EventsLoop {
     pub fn poll_events<F>(&mut self, callback: F)
         where F: FnMut(Event)
     {
-        self.events_loop.poll_events(callback)
+        self.event_loop.poll_events(callback)
     }
 
     /// Calls `callback` every time an event is received. If no event is available, sleeps the
@@ -90,14 +90,14 @@ impl EventsLoop {
     pub fn run_forever<F>(&mut self, callback: F)
         where F: FnMut(Event) -> ControlFlow
     {
-        self.events_loop.run_forever(callback)
+        self.event_loop.run_forever(callback)
     }
 
     /// Creates an `EventsLoopProxy` that can be used to wake up the `EventsLoop` from another
     /// thread.
     pub fn create_proxy(&self) -> EventsLoopProxy {
         EventsLoopProxy {
-            events_loop_proxy: self.events_loop.create_proxy(),
+            event_loop_proxy: self.event_loop.create_proxy(),
         }
     }
 }
@@ -105,7 +105,7 @@ impl EventsLoop {
 /// Used to wake up the `EventsLoop` from another thread.
 #[derive(Clone)]
 pub struct EventsLoopProxy {
-    events_loop_proxy: platform_impl::EventsLoopProxy,
+    event_loop_proxy: platform_impl::EventsLoopProxy,
 }
 
 impl std::fmt::Debug for EventsLoopProxy {
@@ -121,7 +121,7 @@ impl EventsLoopProxy {
     ///
     /// Returns an `Err` if the associated `EventsLoop` no longer exists.
     pub fn wakeup(&self) -> Result<(), EventsLoopClosed> {
-        self.events_loop_proxy.wakeup()
+        self.event_loop_proxy.wakeup()
     }
 }
 

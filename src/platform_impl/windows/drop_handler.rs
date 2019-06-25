@@ -14,7 +14,7 @@ use winapi::um::oleidl::{DROPEFFECT_COPY, DROPEFFECT_NONE, IDropTarget, IDropTar
 use winapi::um::winnt::HRESULT;
 use winapi::um::{shellapi, unknwnbase};
 
-use platform_impl::platform::events_loop::send_event;
+use platform_impl::platform::event_loop::send_event;
 use platform_impl::platform::WindowId;
 
 use {Event, WindowId as SuperWindowId};

@@ -1,16 +1,16 @@
 extern crate winit;
 
-use winit::{Event, ElementState, MouseCursor, WindowEvent, KeyboardInput, events_loop::ControlFlow};
+use winit::{Event, ElementState, MouseCursor, WindowEvent, KeyboardInput, event_loop::ControlFlow};
 
 fn main() {
-    let mut events_loop = winit::events_loop::EventsLoop::new();
+    let mut event_loop = winit::event_loop::EventsLoop::new();
 
-    let window = winit::WindowBuilder::new().build(&events_loop).unwrap();
+    let window = winit::WindowBuilder::new().build(&event_loop).unwrap();
     window.set_title("A fantastic window!");
 
     let mut cursor_idx = 0;
 
-    events_loop.run_forever(|event| {
+    event_loop.run_forever(|event| {
         match event {
             Event::WindowEvent { event: WindowEvent::KeyboardInput { input: KeyboardInput { state: ElementState::Pressed, .. }, .. }, .. } => {
                 println!("Setting cursor to \"{:?}\"", CURSORS[cursor_idx]);

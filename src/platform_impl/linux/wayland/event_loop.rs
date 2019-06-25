@@ -117,7 +117,7 @@ impl EventsLoop {
             sink: sink.clone(),
             store: store.clone(),
             seats: seats.clone(),
-            events_loop_proxy: EventsLoopProxy {
+            event_loop_proxy: EventsLoopProxy {
                 display: Arc::downgrade(&display),
                 pending_wakeup: Arc::downgrade(&pending_wakeup),
             },
@@ -293,7 +293,7 @@ struct SeatManager {
     sink: Arc<Mutex<EventsLoopSink>>,
     store: Arc<Mutex<WindowStore>>,
     seats: Arc<Mutex<Vec<(u32, Proxy<wl_seat::WlSeat>)>>>,
-    events_loop_proxy: EventsLoopProxy,
+    event_loop_proxy: EventsLoopProxy,
 }
 
 impl SeatManager {
@@ -307,7 +307,7 @@ impl SeatManager {
             pointer: None,
             keyboard: None,
             touch: None,
-            events_loop_proxy: self.events_loop_proxy.clone(),
+            event_loop_proxy: self.event_loop_proxy.clone(),
             modifiers_tracker: Arc::new(Mutex::new(ModifiersState::default())),
         };
         let seat = registry
@@ -339,7 +339,7 @@ struct SeatData {
     pointer: Option<Proxy<wl_pointer::WlPointer>>,
     keyboard: Option<Proxy<wl_keyboard::WlKeyboard>>,
     touch: Option<Proxy<wl_touch::WlTouch>>,
-    events_loop_proxy: EventsLoopProxy,
+    event_loop_proxy: EventsLoopProxy,
     modifiers_tracker: Arc<Mutex<ModifiersState>>,
 }
 
@@ -371,7 +371,7 @@ impl SeatData {
                     self.keyboard = Some(super::keyboard::init_keyboard(
                         &seat,
                         self.sink.clone(),
-                        self.events_loop_proxy.clone(),
+                        self.event_loop_proxy.clone(),
                         self.modifiers_tracker.clone(),
                     ))
                 }

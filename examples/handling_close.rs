@@ -1,16 +1,16 @@
 extern crate winit;
 
 fn main() {
-    let mut events_loop = winit::events_loop::EventsLoop::new();
+    let mut event_loop = winit::event_loop::EventsLoop::new();
 
     let _window = winit::WindowBuilder::new()
         .with_title("Your faithful window")
-        .build(&events_loop)
+        .build(&event_loop)
         .unwrap();
 
     let mut close_requested = false;
 
-    events_loop.run_forever(|event| {
+    event_loop.run_forever(|event| {
         use winit::WindowEvent::*;
         use winit::ElementState::Released;
         use winit::VirtualKeyCode::{N, Y};
@@ -53,7 +53,7 @@ fn main() {
                             // event loop (i.e. if it's a multi-window application), you need to
                             // drop the window. That closes it, and results in `Destroyed` being
                             // sent.
-                            return winit::events_loop::ControlFlow::Break;
+                            return winit::event_loop::ControlFlow::Break;
                         }
                     }
                     N => {
@@ -69,6 +69,6 @@ fn main() {
             _ => (),
         }
 
-        winit::events_loop::ControlFlow::Continue
+        winit::event_loop::ControlFlow::Continue
     });
 }
