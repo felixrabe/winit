@@ -7,8 +7,8 @@ use dpi::{LogicalPosition, LogicalSize};
 use platform_impl::MonitorHandle as PlatformMonitorHandle;
 use window::MonitorHandle as RootMonitorHandle;
 =======
-use platform::{MonitorId as PlatformMonitorId, PlatformSpecificWindowBuilderAttributes as PlAttributes};
-use window::MonitorId as RootMonitorId;
+use platform::{MonitorHandle as PlatformMonitorHandle, PlatformSpecificWindowBuilderAttributes as PlAttributes};
+use window::MonitorHandle as RootMonitorHandle;
 >>>>>>> master:src/platform/linux/wayland/window.rs
 
 use sctk::surface::{get_dpi_factor, get_outputs};
@@ -280,9 +280,9 @@ impl Window {
         let guard = self.monitors.lock().unwrap();
         guard.monitors.last().unwrap().clone()
 =======
-    pub fn get_current_monitor(&self) -> MonitorId {
+    pub fn get_current_monitor(&self) -> MonitorHandle {
         let output = get_outputs(&self.surface).last().unwrap().clone();
-        MonitorId {
+        MonitorHandle {
             proxy: output,
             mgr: self.outputs.clone(),
         }
