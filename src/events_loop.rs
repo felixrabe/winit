@@ -2,7 +2,7 @@
 
 use platform_impl;
 use events::Event;
-use {AvailableMonitorsIter, MonitorId};
+use {AvailableMonitorsIter, MonitorHandle};
 
 /// Provides a way to retrieve events from the system and from the windows that were registered to
 /// the events loop.
@@ -65,8 +65,8 @@ impl EventsLoop {
 
     /// Returns the primary monitor of the system.
     #[inline]
-    pub fn get_primary_monitor(&self) -> MonitorId {
-        MonitorId { inner: self.events_loop.get_primary_monitor() }
+    pub fn get_primary_monitor(&self) -> MonitorHandle {
+        MonitorHandle { inner: self.events_loop.get_primary_monitor() }
     }
 
     /// Fetches all the events that are pending, calls the callback function for each of them,

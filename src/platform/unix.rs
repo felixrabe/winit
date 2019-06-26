@@ -9,7 +9,7 @@ use sctk::window::{ButtonState, Theme};
 use {
     EventsLoop,
     LogicalSize,
-    MonitorId,
+    MonitorHandle,
     Window,
     WindowBuilder,
 };
@@ -373,13 +373,13 @@ impl WindowBuilderExt for WindowBuilder {
     }
 }
 
-/// Additional methods on `MonitorId` that are specific to Linux.
-pub trait MonitorIdExt {
+/// Additional methods on `MonitorHandle` that are specific to Linux.
+pub trait MonitorHandleExt {
     /// Returns the inner identifier of the monitor.
     fn native_id(&self) -> u32;
 }
 
-impl MonitorIdExt for MonitorId {
+impl MonitorHandleExt for MonitorHandle {
     #[inline]
     fn native_id(&self) -> u32 {
         self.inner.get_native_identifier()

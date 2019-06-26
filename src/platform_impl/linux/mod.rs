@@ -18,7 +18,7 @@ use {
     WindowAttributes,
 };
 use dpi::{LogicalPosition, LogicalSize, PhysicalPosition, PhysicalSize};
-use window::MonitorId as RootMonitorId;
+use window::MonitorHandle as RootMonitorHandle;
 use self::x11::{XConnection, XError};
 use self::x11::ffi::XVisualInfo;
 pub use self::x11::XNotSupported;
@@ -85,49 +85,49 @@ impl DeviceId {
 }
 
 #[derive(Debug, Clone)]
-pub enum MonitorId {
-    X(x11::MonitorId),
-    Wayland(wayland::MonitorId),
+pub enum MonitorHandle {
+    X(x11::MonitorHandle),
+    Wayland(wayland::MonitorHandle),
 }
 
-impl MonitorId {
+impl MonitorHandle {
     #[inline]
     pub fn get_name(&self) -> Option<String> {
         match self {
-            &MonitorId::X(ref m) => m.get_name(),
-            &MonitorId::Wayland(ref m) => m.get_name(),
+            &MonitorHandle::X(ref m) => m.get_name(),
+            &MonitorHandle::Wayland(ref m) => m.get_name(),
         }
     }
 
     #[inline]
     pub fn get_native_identifier(&self) -> u32 {
         match self {
-            &MonitorId::X(ref m) => m.get_native_identifier(),
-            &MonitorId::Wayland(ref m) => m.get_native_identifier(),
+            &MonitorHandle::X(ref m) => m.get_native_identifier(),
+            &MonitorHandle::Wayland(ref m) => m.get_native_identifier(),
         }
     }
 
     #[inline]
     pub fn get_dimensions(&self) -> PhysicalSize {
         match self {
-            &MonitorId::X(ref m) => m.get_dimensions(),
-            &MonitorId::Wayland(ref m) => m.get_dimensions(),
+            &MonitorHandle::X(ref m) => m.get_dimensions(),
+            &MonitorHandle::Wayland(ref m) => m.get_dimensions(),
         }
     }
 
     #[inline]
     pub fn get_position(&self) -> PhysicalPosition {
         match self {
-            &MonitorId::X(ref m) => m.get_position(),
-            &MonitorId::Wayland(ref m) => m.get_position(),
+            &MonitorHandle::X(ref m) => m.get_position(),
+            &MonitorHandle::Wayland(ref m) => m.get_position(),
         }
     }
 
     #[inline]
     pub fn get_hidpi_factor(&self) -> f64 {
         match self {
-            &MonitorId::X(ref m) => m.get_hidpi_factor(),
-            &MonitorId::Wayland(ref m) => m.get_hidpi_factor() as f64,
+            &MonitorHandle::X(ref m) => m.get_hidpi_factor(),
+            &MonitorHandle::Wayland(ref m) => m.get_hidpi_factor() as f64,
         }
     }
 }
@@ -302,7 +302,7 @@ impl Window {
     }
 
     #[inline]
-    pub fn set_fullscreen(&self, monitor: Option<RootMonitorId>) {
+    pub fn set_fullscreen(&self, monitor: Option<RootMonitorHandle>) {
         match self {
             &Window::X(ref w) => w.set_fullscreen(monitor),
             &Window::Wayland(ref w) => w.set_fullscreen(monitor)
@@ -342,32 +342,32 @@ impl Window {
     }
 
     #[inline]
-    pub fn get_current_monitor(&self) -> RootMonitorId {
+    pub fn get_current_monitor(&self) -> RootMonitorHandle {
         match self {
-            &Window::X(ref window) => RootMonitorId { inner: MonitorId::X(window.get_current_monitor()) },
-            &Window::Wayland(ref window) => RootMonitorId { inner: MonitorId::Wayland(window.get_current_monitor()) },
+            &Window::X(ref window) => RootMonitorHandle { inner: MonitorHandle::X(window.get_current_monitor()) },
+            &Window::Wayland(ref window) => RootMonitorHandle { inner: MonitorHandle::Wayland(window.get_current_monitor()) },
         }
     }
 
     #[inline]
-    pub fn get_available_monitors(&self) -> VecDeque<MonitorId> {
+    pub fn get_available_monitors(&self) -> VecDeque<MonitorHandle> {
         match self {
             &Window::X(ref window) => window.get_available_monitors()
                 .into_iter()
-                .map(MonitorId::X)
+                .map(MonitorHandle::X)
                 .collect(),
             &Window::Wayland(ref window) => window.get_available_monitors()
                 .into_iter()
-                .map(MonitorId::Wayland)
+                .map(MonitorHandle::Wayland)
                 .collect(),
         }
     }
 
     #[inline]
-    pub fn get_primary_monitor(&self) -> MonitorId {
+    pub fn get_primary_monitor(&self) -> MonitorHandle {
         match self {
-            &Window::X(ref window) => MonitorId::X(window.get_primary_monitor()),
-            &Window::Wayland(ref window) => MonitorId::Wayland(window.get_primary_monitor()),
+            &Window::X(ref window) => MonitorHandle::X(window.get_primary_monitor()),
+            &Window::Wayland(ref window) => MonitorHandle::Wayland(window.get_primary_monitor()),
         }
     }
 }
@@ -466,27 +466,27 @@ impl EventsLoop {
     }
 
     #[inline]
-    pub fn get_available_monitors(&self) -> VecDeque<MonitorId> {
+    pub fn get_available_monitors(&self) -> VecDeque<MonitorHandle> {
         match *self {
             EventsLoop::Wayland(ref evlp) => evlp
                 .get_available_monitors()
                 .into_iter()
-                .map(MonitorId::Wayland)
+                .map(MonitorHandle::Wayland)
                 .collect(),
             EventsLoop::X(ref evlp) => evlp
                 .x_connection()
                 .get_available_monitors()
                 .into_iter()
-                .map(MonitorId::X)
+                .map(MonitorHandle::X)
                 .collect(),
         }
     }
 
     #[inline]
-    pub fn get_primary_monitor(&self) -> MonitorId {
+    pub fn get_primary_monitor(&self) -> MonitorHandle {
         match *self {
-            EventsLoop::Wayland(ref evlp) => MonitorId::Wayland(evlp.get_primary_monitor()),
-            EventsLoop::X(ref evlp) => MonitorId::X(evlp.x_connection().get_primary_monitor()),
+            EventsLoop::Wayland(ref evlp) => MonitorHandle::Wayland(evlp.get_primary_monitor()),
+            EventsLoop::X(ref evlp) => MonitorHandle::X(evlp.x_connection().get_primary_monitor()),
         }
     }
 

@@ -121,7 +121,7 @@ extern crate smithay_client_toolkit as sctk;
 
 pub(crate) use dpi::*; // TODO: Actually change the imports throughout the codebase.
 pub use events::*;
-pub use window::{AvailableMonitorsIter, MonitorId};
+pub use window::{AvailableMonitorsIter, MonitorHandle};
 pub use icon::*;
 
 pub mod dpi;
@@ -338,7 +338,7 @@ pub struct WindowAttributes {
     /// Whether the window should be set as fullscreen upon creation.
     ///
     /// The default is `None`.
-    pub fullscreen: Option<MonitorId>,
+    pub fullscreen: Option<MonitorHandle>,
 
     /// The title of the window in the title bar.
     ///

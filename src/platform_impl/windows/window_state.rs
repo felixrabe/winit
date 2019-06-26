@@ -23,7 +23,7 @@ pub struct WindowState {
     pub saved_window: Option<SavedWindow>,
     pub dpi_factor: f64,
 
-    pub fullscreen: Option<::MonitorId>,
+    pub fullscreen: Option<::MonitorHandle>,
     window_flags: WindowFlags,
 }
 

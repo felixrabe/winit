@@ -2,7 +2,7 @@
 
 use std::os::raw::c_void;
 
-use {MonitorId, Window, WindowBuilder};
+use {MonitorHandle, Window, WindowBuilder};
 
 /// Additional methods on `Window` that are specific to iOS.
 pub trait WindowExt {
@@ -45,13 +45,13 @@ impl WindowBuilderExt for WindowBuilder {
     }
 }
 
-/// Additional methods on `MonitorId` that are specific to iOS.
-pub trait MonitorIdExt {
+/// Additional methods on `MonitorHandle` that are specific to iOS.
+pub trait MonitorHandleExt {
     /// Returns a pointer to the `UIScreen` that is used by this monitor.
     fn get_uiscreen(&self) -> *mut c_void;
 }
 
-impl MonitorIdExt for MonitorId {
+impl MonitorHandleExt for MonitorHandle {
     #[inline]
     fn get_uiscreen(&self) -> *mut c_void {
         self.inner.get_uiscreen() as _

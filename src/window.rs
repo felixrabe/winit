@@ -69,10 +69,10 @@ impl WindowBuilder {
         self
     }
 
-    /// Sets the window fullscreen state. None means a normal window, Some(MonitorId)
+    /// Sets the window fullscreen state. None means a normal window, Some(MonitorHandle)
     /// means a fullscreen window on that specific monitor
     #[inline]
-    pub fn with_fullscreen(mut self, monitor: Option<MonitorId>) -> WindowBuilder {
+    pub fn with_fullscreen(mut self, monitor: Option<MonitorHandle>) -> WindowBuilder {
         self.window.fullscreen = monitor;
         self
     }
@@ -365,7 +365,7 @@ impl Window {
 
     /// Sets the window to fullscreen or back
     #[inline]
-    pub fn set_fullscreen(&self, monitor: Option<MonitorId>) {
+    pub fn set_fullscreen(&self, monitor: Option<MonitorHandle>) {
         self.window.set_fullscreen(monitor)
     }
 
@@ -402,7 +402,7 @@ impl Window {
 
     /// Returns the monitor on which the window currently resides
     #[inline]
-    pub fn get_current_monitor(&self) -> MonitorId {
+    pub fn get_current_monitor(&self) -> MonitorHandle {
         self.window.get_current_monitor()
     }
 
@@ -419,8 +419,8 @@ impl Window {
     ///
     /// This is the same as `EventsLoop::get_primary_monitor`, and is provided for convenience.
     #[inline]
-    pub fn get_primary_monitor(&self) -> MonitorId {
-        MonitorId { inner: self.window.get_primary_monitor() }
+    pub fn get_primary_monitor(&self) -> MonitorHandle {
+        MonitorHandle { inner: self.window.get_primary_monitor() }
     }
 
     #[inline]
@@ -434,15 +434,15 @@ impl Window {
 // This may change in the future.
 #[derive(Debug)]
 pub struct AvailableMonitorsIter {
-    pub(crate) data: VecDequeIter<platform_impl::MonitorId>,
+    pub(crate) data: VecDequeIter<platform_impl::MonitorHandle>,
 }
 
 impl Iterator for AvailableMonitorsIter {
-    type Item = MonitorId;
+    type Item = MonitorHandle;
 
     #[inline]
-    fn next(&mut self) -> Option<MonitorId> {
-        self.data.next().map(|id| MonitorId { inner: id })
+    fn next(&mut self) -> Option<MonitorHandle> {
+        self.data.next().map(|id| MonitorHandle { inner: id })
     }
 
     #[inline]
@@ -453,11 +453,11 @@ impl Iterator for AvailableMonitorsIter {
 
 /// Identifier for a monitor.
 #[derive(Debug, Clone)]
-pub struct MonitorId {
-    pub(crate) inner: platform_impl::MonitorId
+pub struct MonitorHandle {
+    pub(crate) inner: platform_impl::MonitorHandle
 }
 
-impl MonitorId {
+impl MonitorHandle {
     /// Returns a human-readable name of the monitor.
     ///
     /// Returns `None` if the monitor doesn't exist anymore.

@@ -21,7 +21,7 @@ use {
     Icon,
     LogicalPosition,
     LogicalSize,
-    MonitorId as RootMonitorId,
+    MonitorHandle as RootMonitorHandle,
     MouseCursor,
     PhysicalSize,
     WindowAttributes,
@@ -356,13 +356,13 @@ impl Window {
     }
 
     #[inline]
-    pub fn set_fullscreen(&self, monitor: Option<RootMonitorId>) {
+    pub fn set_fullscreen(&self, monitor: Option<RootMonitorHandle>) {
         unsafe {
             let window = self.window.clone();
             let window_state = Arc::clone(&self.window_state);
 
             match &monitor {
-                &Some(RootMonitorId { ref inner }) => {
+                &Some(RootMonitorHandle { ref inner }) => {
                     let (x, y): (i32, i32) = inner.get_position().into();
                     let (width, height): (u32, u32) = inner.get_dimensions().into();
 
@@ -446,8 +446,8 @@ impl Window {
     }
 
     #[inline]
-    pub fn get_current_monitor(&self) -> RootMonitorId {
-        RootMonitorId {
+    pub fn get_current_monitor(&self) -> RootMonitorHandle {
+        RootMonitorHandle {
             inner: EventsLoop::get_current_monitor(self.window.0),
         }
     }

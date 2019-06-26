@@ -102,7 +102,7 @@ fn main() {
 }
 
 // Enumerate monitors and prompt user to choose one
-fn prompt_for_monitor(events_loop: &winit::events_loop::EventsLoop) -> winit::MonitorId {
+fn prompt_for_monitor(events_loop: &winit::events_loop::EventsLoop) -> winit::MonitorHandle {
     for (num, monitor) in events_loop.get_available_monitors().enumerate() {
         println!("Monitor #{}: {:?}", num, monitor.get_name());
     }
