@@ -209,8 +209,8 @@ impl DeviceId {
 ///
 /// To wake up an `EventsLoop` from a another thread, see the `EventsLoopProxy` docs.
 ///
-/// Note that the `EventsLoop` cannot be shared accross threads (due to platform-dependant logic
-/// forbiding it), as such it is neither `Send` nor `Sync`. If you need cross-thread access, the
+/// Note that the `EventsLoop` cannot be shared across threads (due to platform-dependant logic
+/// forbidding it), as such it is neither `Send` nor `Sync`. If you need cross-thread access, the
 /// `Window` created from this `EventsLoop` _can_ be sent to an other thread, and the
 /// `EventsLoopProxy` allows you to wakeup an `EventsLoop` from an other thread.
 pub struct EventsLoop {
