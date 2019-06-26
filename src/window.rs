@@ -9,7 +9,7 @@ use {
     MouseCursor,
     PhysicalPosition,
     PhysicalSize,
-    platform,
+    platform_impl,
     Window,
     WindowBuilder,
     WindowId,
