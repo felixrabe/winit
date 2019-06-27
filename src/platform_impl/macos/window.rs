@@ -31,21 +31,21 @@ use objc::runtime::{Class, Object, Sel, BOOL, YES, NO};
 use objc::declare::ClassDecl;
 
 use {
-    CreationError,
+    window::CreationError,
     Event,
     LogicalPosition,
     LogicalSize,
-    MouseCursor,
-    WindowAttributes,
+    window::MouseCursor,
+    window::WindowAttributes,
     WindowEvent,
-    WindowId,
+    window::WindowId,
 };
-use CreationError::OsError;
+use window::CreationError::OsError;
 use platform::macos::{ActivationPolicy, WindowExtMacOS};
 use platform_impl::platform::{ffi, util};
 use platform_impl::platform::event_loop::{EventLoop, Shared};
 use platform_impl::platform::view::{new_view, set_ime_spot};
-use window::MonitorHandle as RootMonitorHandle;
+use monitor::MonitorHandle as RootMonitorHandle;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Id(pub usize);

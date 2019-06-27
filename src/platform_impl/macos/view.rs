@@ -13,7 +13,7 @@ use cocoa::foundation::{NSPoint, NSRect, NSSize, NSString, NSUInteger};
 use objc::declare::ClassDecl;
 use objc::runtime::{Class, Object, Protocol, Sel, BOOL, YES};
 
-use {ElementState, Event, KeyboardInput, MouseButton, WindowEvent, WindowId};
+use {ElementState, Event, KeyboardInput, MouseButton, WindowEvent, window::WindowId};
 use platform_impl::platform::event_loop::{DEVICE_ID, event_mods, Shared, to_virtual_key_code, check_additional_virtual_key_codes};
 use platform_impl::platform::util;
 use platform_impl::platform::ffi::*;

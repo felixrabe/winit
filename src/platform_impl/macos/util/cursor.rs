@@ -5,7 +5,7 @@ use cocoa::{
 use objc::runtime::Sel;
 
 use super::IntoOption;
-use MouseCursor;
+use window::MouseCursor;
 
 pub enum Cursor {
     Native(&'static str),
