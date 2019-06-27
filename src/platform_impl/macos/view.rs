@@ -174,7 +174,7 @@ extern fn draw_rect(this: &Object, _sel: Sel, rect: NSRect) {
         if let Some(shared) = state.shared.upgrade() {
             let window_event = Event::WindowEvent {
                 window_id: WindowId(get_window_id(state.window)),
-                event: WindowEvent::Refresh,
+                event: WindowEvent::Redraw,
             };
             shared.pending_events
                 .lock()

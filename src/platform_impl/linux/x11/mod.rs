@@ -582,7 +582,7 @@ impl EventLoop {
                 let window = xev.window;
                 let window_id = mkwid(window);
 
-                callback(Event::WindowEvent { window_id, event: WindowEvent::Refresh });
+                callback(Event::WindowEvent { window_id, event: WindowEvent::Redraw });
             }
 
             ffi::KeyPress | ffi::KeyRelease => {

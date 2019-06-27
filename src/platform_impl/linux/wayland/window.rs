@@ -56,7 +56,7 @@ impl Window {
                         }
                     }
                 }
-                WEvent::Refresh => {
+                WEvent::Redraw => {
                     let store = window_store.lock().unwrap();
                     for window in &store.windows {
                         if window.surface.equals(&my_surface) {

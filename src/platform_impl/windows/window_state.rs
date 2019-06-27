@@ -287,7 +287,7 @@ impl WindowFlags {
                         );
                     },
                     None => {
-                        // Refresh the window frame.
+                        // Redraw the window frame.
                         winuser::SetWindowPos(
                             window,
                             ptr::null_mut(),

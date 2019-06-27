@@ -546,10 +546,10 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_PAINT => {
-            use event::WindowEvent::Refresh;
+            use event::WindowEvent::Redraw;
             send_event(Event::WindowEvent {
                 window_id: SuperWindowId(WindowId(window)),
-                event: Refresh,
+                event: Redraw,
             });
             winuser::DefWindowProcW(window, msg, wparam, lparam)
         },
