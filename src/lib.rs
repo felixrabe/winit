@@ -125,11 +125,11 @@ pub use window::{AvailableMonitorsIter, MonitorHandle};
 pub use icon::*;
 
 pub mod dpi;
+pub mod event;
 pub mod event_loop;
-mod event;
 mod icon;
 mod platform_impl;
-mod window;
+pub mod window;
 
 pub mod platform;
 
