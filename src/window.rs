@@ -1,18 +1,13 @@
 use std::collections::vec_deque::IntoIter as VecDequeIter;
 
 use {
-    CreationError,
     event_loop::EventLoop,
     Icon,
     LogicalPosition,
     LogicalSize,
-    MouseCursor,
     PhysicalPosition,
     PhysicalSize,
     platform_impl,
-    Window,
-    WindowBuilder,
-    WindowId,
 };
 
 /// Represents a window.
