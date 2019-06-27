@@ -96,7 +96,7 @@ impl Theme for WaylandThemeObject {
 }
 
 /// Additional methods on `EventLoop` that are specific to Linux.
-pub trait EventLoopExt {
+pub trait EventLoopExtUnix {
     /// Builds a new `EventLoop` that is forced to use X11.
     fn new_x11() -> Result<Self, XNotSupported>
         where Self: Sized;
@@ -115,7 +115,7 @@ pub trait EventLoopExt {
     fn get_xlib_xconnection(&self) -> Option<Arc<XConnection>>;
 }
 
-impl EventLoopExt for EventLoop {
+impl EventLoopExtUnix for EventLoop {
     #[inline]
     fn new_x11() -> Result<Self, XNotSupported> {
         LinuxEventLoop::new_x11().map(|ev|
@@ -155,7 +155,7 @@ impl EventLoopExt for EventLoop {
 }
 
 /// Additional methods on `Window` that are specific to Unix.
-pub trait WindowExt {
+pub trait WindowExtUnix {
     /// Returns the ID of the `Window` xlib object that is used by this window.
     ///
     /// Returns `None` if the window doesn't use xlib (if it uses wayland for example).
@@ -210,7 +210,7 @@ pub trait WindowExt {
     fn is_ready(&self) -> bool;
 }
 
-impl WindowExt for Window {
+impl WindowExtUnix for Window {
     #[inline]
     fn get_xlib_window(&self) -> Option<raw::c_ulong> {
         match self.window {
@@ -290,7 +290,7 @@ impl WindowExt for Window {
 }
 
 /// Additional methods on `WindowBuilder` that are specific to Unix.
-pub trait WindowBuilderExt {
+pub trait WindowBuilderExtUnix {
     fn with_x11_visual<T>(self, visual_infos: *const T) -> WindowBuilder;
     fn with_x11_screen(self, screen_id: i32) -> WindowBuilder;
 
@@ -315,7 +315,7 @@ pub trait WindowBuilderExt {
     fn with_app_id(self, app_id: String) -> WindowBuilder;
 }
 
-impl WindowBuilderExt for WindowBuilder {
+impl WindowBuilderExtUnix for WindowBuilder {
     #[inline]
     fn with_x11_visual<T>(mut self, visual_infos: *const T) -> WindowBuilder {
         self.platform_specific.visual_infos = Some(
@@ -374,12 +374,12 @@ impl WindowBuilderExt for WindowBuilder {
 }
 
 /// Additional methods on `MonitorHandle` that are specific to Linux.
-pub trait MonitorHandleExt {
+pub trait MonitorHandleExtUnix {
     /// Returns the inner identifier of the monitor.
     fn native_id(&self) -> u32;
 }
 
-impl MonitorHandleExt for MonitorHandle {
+impl MonitorHandleExtUnix for MonitorHandle {
     #[inline]
     fn native_id(&self) -> u32 {
         self.inner.get_native_identifier()
