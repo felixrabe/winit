@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
-use {DeviceId, LogicalPosition, LogicalSize, WindowId};
+use dpi::{LogicalPosition, LogicalSize};
+use window::{DeviceId, WindowId};
 
 /// Describes a generic event.
 #[derive(Clone, Debug, PartialEq)]
