@@ -14,7 +14,7 @@ use sctk::reexports::client::protocol::wl_surface::RequestsTrait as SurfaceReque
 use sctk::output::OutputMgr;
 
 use super::{make_wid, EventsLoop, MonitorId, WindowId};
-use platform::platform::wayland::event_loop::{get_available_monitors, get_primary_monitor};
+use platform_impl::platform::wayland::event_loop::{get_available_monitors, get_primary_monitor};
 
 pub struct Window {
     surface: Proxy<wl_surface::WlSurface>,

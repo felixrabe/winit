@@ -128,7 +128,7 @@ pub mod dpi;
 pub mod events_loop;
 mod events;
 mod icon;
-mod platform;
+mod platform_impl;
 mod window;
 
 pub mod os;
@@ -153,7 +153,7 @@ pub mod os;
 /// });
 /// ```
 pub struct Window {
-    window: platform::Window,
+    window: platform_impl::Window,
 }
 
 impl std::fmt::Debug for Window {
@@ -169,7 +169,7 @@ impl std::fmt::Debug for Window {
 /// Whenever you receive an event specific to a window, this event contains a `WindowId` which you
 /// can then compare to the ids of your windows.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct WindowId(platform::WindowId);
+pub struct WindowId(platform_impl::WindowId);
 
 impl WindowId {
     /// Returns a dummy `WindowId`, useful for unit testing. The only guarantee made about the return
@@ -178,7 +178,7 @@ impl WindowId {
     ///
     /// **Passing this into a winit function will result in undefined behavior.**
     pub unsafe fn dummy() -> Self {
-        WindowId(platform::WindowId::dummy())
+        WindowId(platform_impl::WindowId::dummy())
     }
 }
 
@@ -188,7 +188,7 @@ impl WindowId {
 /// identifies its origin. Note that devices may be virtual (representing an on-screen cursor and keyboard focus) or
 /// physical. Virtual devices typically aggregate inputs from multiple physical devices.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct DeviceId(platform::DeviceId);
+pub struct DeviceId(platform_impl::DeviceId);
 
 impl DeviceId {
     /// Returns a dummy `DeviceId`, useful for unit testing. The only guarantee made about the return
@@ -197,7 +197,7 @@ impl DeviceId {
     ///
     /// **Passing this into a winit function will result in undefined behavior.**
     pub unsafe fn dummy() -> Self {
-        DeviceId(platform::DeviceId::dummy())
+        DeviceId(platform_impl::DeviceId::dummy())
     }
 }
 
@@ -208,7 +208,7 @@ pub struct WindowBuilder {
     pub window: WindowAttributes,
 
     // Platform-specific configuration. Private.
-    platform_specific: platform::PlatformSpecificWindowBuilderAttributes,
+    platform_specific: platform_impl::PlatformSpecificWindowBuilderAttributes,
 }
 
 impl std::fmt::Debug for WindowBuilder {

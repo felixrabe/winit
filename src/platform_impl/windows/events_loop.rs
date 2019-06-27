@@ -51,18 +51,18 @@ use {
     WindowId as SuperWindowId,
 };
 use events::{DeviceEvent, Touch, TouchPhase};
-use platform::platform::{event, WindowId, DEVICE_ID, wrap_device_id, util};
-use platform::platform::dpi::{
+use platform_impl::platform::{event, WindowId, DEVICE_ID, wrap_device_id, util};
+use platform_impl::platform::dpi::{
     become_dpi_aware,
     dpi_to_scale_factor,
     enable_non_client_dpi_scaling,
     get_hwnd_scale_factor,
 };
-use platform::platform::drop_handler::FileDropHandler;
-use platform::platform::event::{handle_extended_keys, process_key_params, vkey_to_winit_vkey};
-use platform::platform::raw_input::{get_raw_input_data, get_raw_mouse_button_state};
-use platform::platform::window::adjust_size;
-use platform::platform::window_state::{CursorFlags, WindowFlags, WindowState};
+use platform_impl::platform::drop_handler::FileDropHandler;
+use platform_impl::platform::event::{handle_extended_keys, process_key_params, vkey_to_winit_vkey};
+use platform_impl::platform::raw_input::{get_raw_input_data, get_raw_mouse_button_state};
+use platform_impl::platform::window::adjust_size;
+use platform_impl::platform::window_state::{CursorFlags, WindowFlags, WindowState};
 
 /// Dummy object that allows inserting a window's state.
 // We store a pointer in order to !impl Send and Sync.
