@@ -66,7 +66,7 @@ fn main() {
                         #[cfg(target_os = "macos")]
                         {
                             if macos_use_simple_fullscreen {
-                                use winit::os::macos::WindowExt;
+                                use winit::platform::macos::WindowExt;
                                 if WindowExt::set_simple_fullscreen(&window, !is_fullscreen) {
                                     is_fullscreen = !is_fullscreen;
                                 }
