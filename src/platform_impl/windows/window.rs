@@ -26,14 +26,14 @@ use {
     PhysicalSize,
     WindowAttributes,
 };
-use platform::platform::{PlatformSpecificWindowBuilderAttributes, WindowId};
-use platform::platform::dpi::{dpi_to_scale_factor, get_hwnd_dpi};
-use platform::platform::events_loop::{self, EventsLoop, DESTROY_MSG_ID, INITIAL_DPI_MSG_ID};
-use platform::platform::icon::{self, IconType, WinIcon};
-use platform::platform::monitor::get_available_monitors;
-use platform::platform::raw_input::register_all_mice_and_keyboards_for_raw_input;
-use platform::platform::util;
-use platform::platform::window_state::{CursorFlags, SavedWindow, WindowFlags, WindowState};
+use platform_impl::platform::{PlatformSpecificWindowBuilderAttributes, WindowId};
+use platform_impl::platform::dpi::{dpi_to_scale_factor, get_hwnd_dpi};
+use platform_impl::platform::events_loop::{self, EventsLoop, DESTROY_MSG_ID, INITIAL_DPI_MSG_ID};
+use platform_impl::platform::icon::{self, IconType, WinIcon};
+use platform_impl::platform::monitor::get_available_monitors;
+use platform_impl::platform::raw_input::register_all_mice_and_keyboards_for_raw_input;
+use platform_impl::platform::util;
+use platform_impl::platform::window_state::{CursorFlags, SavedWindow, WindowFlags, WindowState};
 
 /// The Win32 implementation of the main `Window` object.
 pub struct Window {

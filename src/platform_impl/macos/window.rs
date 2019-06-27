@@ -42,9 +42,9 @@ use {
 };
 use CreationError::OsError;
 use os::macos::{ActivationPolicy, WindowExt};
-use platform::platform::{ffi, util};
-use platform::platform::events_loop::{EventsLoop, Shared};
-use platform::platform::view::{new_view, set_ime_spot};
+use platform_impl::platform::{ffi, util};
+use platform_impl::platform::events_loop::{EventsLoop, Shared};
+use platform_impl::platform::view::{new_view, set_ime_spot};
 use window::MonitorId as RootMonitorId;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
