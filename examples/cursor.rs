@@ -1,6 +1,6 @@
 extern crate winit;
 
-use winit::{Event, ElementState, MouseCursor, WindowEvent, KeyboardInput, ControlFlow};
+use winit::{Event, ElementState, MouseCursor, WindowEvent, KeyboardInput, events_loop::ControlFlow};
 
 fn main() {
     let mut events_loop = winit::events_loop::EventsLoop::new();

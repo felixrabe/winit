@@ -1,3 +1,9 @@
+//! The `EventsLoop` struct and assorted supporting types, including `ControlFlow`.
+
+use platform;
+use events::Event;
+use {AvailableMonitorsIter, MonitorId};
+
 /// Provides a way to retrieve events from the system and from the windows that were registered to
 /// the events loop.
 ///
@@ -12,7 +18,7 @@
 /// `Window` created from this `EventsLoop` _can_ be sent to an other thread, and the
 /// `EventsLoopProxy` allows you to wakeup an `EventsLoop` from an other thread.
 pub struct EventsLoop {
-    events_loop: platform::EventsLoop,
+    pub(crate) events_loop: platform::EventsLoop,
     _marker: ::std::marker::PhantomData<*mut ()> // Not Send nor Sync
 }
 

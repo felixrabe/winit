@@ -58,7 +58,7 @@
 //! forever unless it is stopped by returning `ControlFlow::Break`.
 //!
 //! ```no_run
-//! use winit::{ControlFlow, Event, WindowEvent};
+//! use winit::{events_loop::ControlFlow, Event, WindowEvent};
 //! # use winit::events_loop::EventsLoop;
 //! # let mut events_loop = EventsLoop::new();
 //!
@@ -125,6 +125,7 @@ pub use window::{AvailableMonitorsIter, MonitorId};
 pub use icon::*;
 
 pub mod dpi;
+pub mod events_loop;
 mod events;
 mod icon;
 mod platform;
@@ -137,7 +138,7 @@ pub mod os;
 /// # Example
 ///
 /// ```no_run
-/// use winit::{Event, EventsLoop, Window, WindowEvent, ControlFlow};
+/// use winit::{Event, events_loop::EventsLoop, Window, WindowEvent, events_loop::ControlFlow};
 ///
 /// let mut events_loop = EventsLoop::new();
 /// let window = Window::new(&events_loop).unwrap();

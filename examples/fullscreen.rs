@@ -1,7 +1,7 @@
 extern crate winit;
 
 use std::io::{self, Write};
-use winit::{ControlFlow, Event, WindowEvent};
+use winit::{events_loop::ControlFlow, Event, WindowEvent};
 
 fn main() {
     let mut events_loop = winit::events_loop::EventsLoop::new();

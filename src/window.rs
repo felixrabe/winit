@@ -2,7 +2,7 @@ use std::collections::vec_deque::IntoIter as VecDequeIter;
 
 use {
     CreationError,
-    EventsLoop,
+    events_loop::EventsLoop,
     Icon,
     LogicalPosition,
     LogicalSize,
