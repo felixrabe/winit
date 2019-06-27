@@ -43,7 +43,7 @@ use {
 use CreationError::OsError;
 use platform::macos::{ActivationPolicy, WindowExt};
 use platform_impl::platform::{ffi, util};
-use platform_impl::platform::events_loop::{EventsLoop, Shared};
+use platform_impl::platform::event_loop::{EventLoop, Shared};
 use platform_impl::platform::view::{new_view, set_ime_spot};
 use window::MonitorHandle as RootMonitorHandle;
 
@@ -183,7 +183,7 @@ pub struct WindowDelegate {
 }
 
 impl WindowDelegate {
-    // Emits an event via the `EventsLoop`'s callback or stores it in the pending queue.
+    // Emits an event via the `EventLoop`'s callback or stores it in the pending queue.
     pub fn emit_event(state: &mut DelegateState, window_event: WindowEvent) {
         let window_id = get_window_id(*state.window);
         let event = Event::WindowEvent {
@@ -560,7 +560,7 @@ unsafe fn get_current_monitor(window: id) -> RootMonitorHandle {
     let key = IdRef::new(NSString::alloc(nil).init_str("NSScreenNumber"));
     let value = NSDictionary::valueForKey_(desc, *key);
     let display_id = msg_send![value, unsignedIntegerValue];
-    RootMonitorHandle { inner: EventsLoop::make_monitor_from_display(display_id) }
+    RootMonitorHandle { inner: EventLoop::make_monitor_from_display(display_id) }
 }
 
 impl Drop for Window2 {

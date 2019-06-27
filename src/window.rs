@@ -2,7 +2,7 @@ use std::collections::vec_deque::IntoIter as VecDequeIter;
 
 use {
     CreationError,
-    events_loop::EventsLoop,
+    event_loop::EventLoop,
     Icon,
     LogicalPosition,
     LogicalSize,
@@ -142,7 +142,7 @@ impl WindowBuilder {
     /// Error should be very rare and only occur in case of permission denied, incompatible system,
     /// out of memory, etc.
     #[inline]
-    pub fn build(mut self, events_loop: &EventsLoop) -> Result<Window, CreationError> {
+    pub fn build(mut self, event_loop: &EventLoop) -> Result<Window, CreationError> {
         self.window.dimensions = Some(self.window.dimensions.unwrap_or_else(|| {
             if let Some(ref monitor) = self.window.fullscreen {
                 // resizing the window to the dimensions of the monitor when fullscreen
@@ -155,7 +155,7 @@ impl WindowBuilder {
 
         // building
         platform_impl::Window::new(
-            &events_loop.events_loop,
+            &event_loop.event_loop,
             self.window,
             self.platform_specific,
         ).map(|window| Window { window })
@@ -165,14 +165,14 @@ impl WindowBuilder {
 impl Window {
     /// Creates a new Window for platforms where this is appropriate.
     ///
-    /// This function is equivalent to `WindowBuilder::new().build(events_loop)`.
+    /// This function is equivalent to `WindowBuilder::new().build(event_loop)`.
     ///
     /// Error should be very rare and only occur in case of permission denied, incompatible system,
     ///  out of memory, etc.
     #[inline]
-    pub fn new(events_loop: &EventsLoop) -> Result<Window, CreationError> {
+    pub fn new(event_loop: &EventLoop) -> Result<Window, CreationError> {
         let builder = WindowBuilder::new();
-        builder.build(events_loop)
+        builder.build(event_loop)
     }
 
     /// Modifies the title of the window.
@@ -408,7 +408,7 @@ impl Window {
 
     /// Returns the list of all the monitors available on the system.
     ///
-    /// This is the same as `EventsLoop::get_available_monitors`, and is provided for convenience.
+    /// This is the same as `EventLoop::get_available_monitors`, and is provided for convenience.
     #[inline]
     pub fn get_available_monitors(&self) -> AvailableMonitorsIter {
         let data = self.window.get_available_monitors();
@@ -417,7 +417,7 @@ impl Window {
 
     /// Returns the primary monitor of the system.
     ///
-    /// This is the same as `EventsLoop::get_primary_monitor`, and is provided for convenience.
+    /// This is the same as `EventLoop::get_primary_monitor`, and is provided for convenience.
     #[inline]
     pub fn get_primary_monitor(&self) -> MonitorHandle {
         MonitorHandle { inner: self.window.get_primary_monitor() }

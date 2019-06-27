@@ -14,7 +14,7 @@ use winapi::um::oleidl::{DROPEFFECT_COPY, DROPEFFECT_NONE, IDropTarget, IDropTar
 use winapi::um::winnt::HRESULT;
 use winapi::um::{shellapi, unknwnbase};
 
-use platform_impl::platform::events_loop::send_event;
+use platform_impl::platform::event_loop::send_event;
 use platform_impl::platform::WindowId;
 
 use {Event, WindowId as SuperWindowId};
@@ -83,7 +83,7 @@ impl FileDropHandler {
         _pt: *const POINTL,
         pdwEffect: *mut DWORD,
     ) -> HRESULT {
-        use events::WindowEvent::HoveredFile;
+        use event::WindowEvent::HoveredFile;
         let drop_handler = Self::from_interface(this);
         let hdrop = Self::iterate_filenames(pDataObj, |filename| {
             send_event(Event::WindowEvent {
@@ -115,7 +115,7 @@ impl FileDropHandler {
     }
 
     pub unsafe extern "system" fn DragLeave(this: *mut IDropTarget) -> HRESULT {
-        use events::WindowEvent::HoveredFileCancelled;
+        use event::WindowEvent::HoveredFileCancelled;
         let drop_handler = Self::from_interface(this);
         if drop_handler.hovered_is_valid {
             send_event(Event::WindowEvent {
@@ -134,7 +134,7 @@ impl FileDropHandler {
         _pt: *const POINTL,
         _pdwEffect: *mut DWORD,
     ) -> HRESULT {
-        use events::WindowEvent::DroppedFile;
+        use event::WindowEvent::DroppedFile;
         let drop_handler = Self::from_interface(this);
         let hdrop = Self::iterate_filenames(pDataObj, |filename| {
             send_event(Event::WindowEvent {

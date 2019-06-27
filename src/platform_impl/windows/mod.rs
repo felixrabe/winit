@@ -3,7 +3,7 @@
 use winapi;
 use winapi::shared::windef::HWND;
 
-pub use self::events_loop::{EventsLoop, EventsLoopProxy};
+pub use self::event_loop::{EventLoop, EventLoopProxy};
 pub use self::monitor::MonitorHandle;
 pub use self::window::Window;
 
@@ -65,7 +65,7 @@ impl WindowId {
 mod dpi;
 mod drop_handler;
 mod event;
-mod events_loop;
+mod event_loop;
 mod icon;
 mod monitor;
 mod raw_input;

@@ -28,7 +28,7 @@ use {
 };
 use platform_impl::platform::{PlatformSpecificWindowBuilderAttributes, WindowId};
 use platform_impl::platform::dpi::{dpi_to_scale_factor, get_hwnd_dpi};
-use platform_impl::platform::events_loop::{self, EventsLoop, DESTROY_MSG_ID, INITIAL_DPI_MSG_ID};
+use platform_impl::platform::event_loop::{self, EventLoop, DESTROY_MSG_ID, INITIAL_DPI_MSG_ID};
 use platform_impl::platform::icon::{self, IconType, WinIcon};
 use platform_impl::platform::monitor::get_available_monitors;
 use platform_impl::platform::raw_input::register_all_mice_and_keyboards_for_raw_input;
@@ -44,18 +44,18 @@ pub struct Window {
     window_state: Arc<Mutex<WindowState>>,
 
     // The events loop proxy.
-    events_loop_proxy: events_loop::EventsLoopProxy,
+    event_loop_proxy: event_loop::EventLoopProxy,
 }
 
 impl Window {
     pub fn new(
-        events_loop: &EventsLoop,
+        event_loop: &EventLoop,
         w_attr: WindowAttributes,
         pl_attr: PlatformSpecificWindowBuilderAttributes,
     ) -> Result<Window, CreationError> {
         let (tx, rx) = channel();
-        let proxy = events_loop.create_proxy();
-        events_loop.execute_in_thread(move |inserter| {
+        let proxy = event_loop.create_proxy();
+        event_loop.execute_in_thread(move |inserter| {
             // We dispatch an `init` function because of code style.
             // First person to remove the need for cloning here gets a cookie!
             let win = unsafe { init(w_attr.clone(), pl_attr.clone(), inserter, proxy.clone()) };
@@ -252,7 +252,7 @@ impl Window {
         let window = self.window.clone();
         let window_state = Arc::clone(&self.window_state);
 
-        self.events_loop_proxy.execute_in_thread(move |_| {
+        self.event_loop_proxy.execute_in_thread(move |_| {
             WindowState::set_window_flags(
                 window_state.lock().unwrap(),
                 window.0,
@@ -271,7 +271,7 @@ impl Window {
     #[inline]
     pub fn set_cursor(&self, cursor: MouseCursor) {
         self.window_state.lock().unwrap().mouse.cursor = cursor;
-        self.events_loop_proxy.execute_in_thread(move |_| unsafe {
+        self.event_loop_proxy.execute_in_thread(move |_| unsafe {
             let cursor = winuser::LoadCursorW(
                 ptr::null_mut(),
                 cursor.to_windows_cursor(),
@@ -286,7 +286,7 @@ impl Window {
         let window_state = Arc::clone(&self.window_state);
         let (tx, rx) = channel();
 
-        self.events_loop_proxy.execute_in_thread(move |_| {
+        self.event_loop_proxy.execute_in_thread(move |_| {
             let result = window_state.lock().unwrap().mouse
                 .set_cursor_flags(window.0, |f| f.set(CursorFlags::GRABBED, grab))
                 .map_err(|e| e.to_string());
@@ -301,7 +301,7 @@ impl Window {
         let window_state = Arc::clone(&self.window_state);
         let (tx, rx) = channel();
 
-        self.events_loop_proxy.execute_in_thread(move |_| {
+        self.event_loop_proxy.execute_in_thread(move |_| {
             let result = window_state.lock().unwrap().mouse
                 .set_cursor_flags(window.0, |f| f.set(CursorFlags::HIDDEN, hide))
                 .map_err(|e| e.to_string());
@@ -345,7 +345,7 @@ impl Window {
         let window = self.window.clone();
         let window_state = Arc::clone(&self.window_state);
 
-        self.events_loop_proxy.execute_in_thread(move |_| {
+        self.event_loop_proxy.execute_in_thread(move |_| {
             WindowState::set_window_flags(
                 window_state.lock().unwrap(),
                 window.0,
@@ -367,7 +367,7 @@ impl Window {
                     let (width, height): (u32, u32) = inner.get_dimensions().into();
 
                     let mut monitor = monitor.clone();
-                    self.events_loop_proxy.execute_in_thread(move |_| {
+                    self.event_loop_proxy.execute_in_thread(move |_| {
                         let mut window_state_lock = window_state.lock().unwrap();
 
                         let client_rect = util::get_client_rect(window.0).expect("get client rect failed!");
@@ -392,7 +392,7 @@ impl Window {
                     });
                 }
                 &None => {
-                    self.events_loop_proxy.execute_in_thread(move |_| {
+                    self.event_loop_proxy.execute_in_thread(move |_| {
                         let mut window_state_lock = window_state.lock().unwrap();
                         window_state_lock.fullscreen = None;
 
@@ -419,7 +419,7 @@ impl Window {
         let window = self.window.clone();
         let window_state = Arc::clone(&self.window_state);
 
-        self.events_loop_proxy.execute_in_thread(move |_| {
+        self.event_loop_proxy.execute_in_thread(move |_| {
             let client_rect = util::get_client_rect(window.0).expect("get client rect failed!");
             WindowState::set_window_flags(
                 window_state.lock().unwrap(),
@@ -435,7 +435,7 @@ impl Window {
         let window = self.window.clone();
         let window_state = Arc::clone(&self.window_state);
 
-        self.events_loop_proxy.execute_in_thread(move |_| {
+        self.event_loop_proxy.execute_in_thread(move |_| {
             WindowState::set_window_flags(
                 window_state.lock().unwrap(),
                 window.0,
@@ -448,7 +448,7 @@ impl Window {
     #[inline]
     pub fn get_current_monitor(&self) -> RootMonitorHandle {
         RootMonitorHandle {
-            inner: EventsLoop::get_current_monitor(self.window.0),
+            inner: EventLoop::get_current_monitor(self.window.0),
         }
     }
 
@@ -526,8 +526,8 @@ pub unsafe fn adjust_size(
 unsafe fn init(
     mut attributes: WindowAttributes,
     mut pl_attribs: PlatformSpecificWindowBuilderAttributes,
-    inserter: events_loop::Inserter,
-    events_loop_proxy: events_loop::EventsLoopProxy,
+    inserter: event_loop::Inserter,
+    event_loop_proxy: event_loop::EventLoopProxy,
 ) -> Result<Window, CreationError> {
     let title = OsStr::new(&attributes.title)
         .encode_wide()
@@ -709,7 +709,7 @@ unsafe fn init(
     let win = Window {
         window: real_window,
         window_state,
-        events_loop_proxy,
+        event_loop_proxy,
     };
 
     if let Some(_) = attributes.fullscreen {
@@ -747,7 +747,7 @@ unsafe fn register_window_class(
     let class = winuser::WNDCLASSEXW {
         cbSize: mem::size_of::<winuser::WNDCLASSEXW>() as UINT,
         style: winuser::CS_HREDRAW | winuser::CS_VREDRAW | winuser::CS_OWNDC,
-        lpfnWndProc: Some(events_loop::callback),
+        lpfnWndProc: Some(event_loop::callback),
         cbClsExtra: 0,
         cbWndExtra: 0,
         hInstance: libloaderapi::GetModuleHandleW(ptr::null()),

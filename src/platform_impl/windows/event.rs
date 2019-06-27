@@ -1,8 +1,8 @@
 use std::char;
 use std::os::raw::c_int;
 
-use events::VirtualKeyCode;
-use events::ModifiersState;
+use event::VirtualKeyCode;
+use event::ModifiersState;
 
 use winapi::shared::minwindef::{WPARAM, LPARAM, UINT};
 use winapi::um::winuser;

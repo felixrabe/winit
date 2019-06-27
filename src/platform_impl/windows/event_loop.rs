@@ -42,7 +42,7 @@ use winapi::um::winnt::{LONG, LPCSTR, SHORT};
 use {
     ControlFlow,
     Event,
-    EventsLoopClosed,
+    EventLoopClosed,
     KeyboardInput,
     LogicalPosition,
     LogicalSize,
@@ -50,7 +50,7 @@ use {
     WindowEvent,
     WindowId as SuperWindowId,
 };
-use events::{DeviceEvent, Touch, TouchPhase};
+use event::{DeviceEvent, Touch, TouchPhase};
 use platform_impl::platform::{event, WindowId, DEVICE_ID, wrap_device_id, util};
 use platform_impl::platform::dpi::{
     become_dpi_aware,
@@ -80,27 +80,27 @@ impl Inserter {
     }
 }
 
-pub struct EventsLoop {
+pub struct EventLoop {
     thread_msg_target: HWND,
     // Id of the background thread from the Win32 API.
     thread_id: DWORD,
     // Receiver for the events. The sender is in the background thread.
-    receiver: mpsc::Receiver<EventsLoopEvent>,
-    // Sender instance that's paired with the receiver. Used to construct an `EventsLoopProxy`.
-    sender: mpsc::Sender<EventsLoopEvent>,
+    receiver: mpsc::Receiver<EventLoopEvent>,
+    // Sender instance that's paired with the receiver. Used to construct an `EventLoopProxy`.
+    sender: mpsc::Sender<EventLoopEvent>,
 }
 
-enum EventsLoopEvent {
+enum EventLoopEvent {
     WinitEvent(Event),
     Panic(PanicError),
 }
 
-impl EventsLoop {
-    pub fn new() -> EventsLoop {
+impl EventLoop {
+    pub fn new() -> EventLoop {
         Self::with_dpi_awareness(true)
     }
 
-    pub fn with_dpi_awareness(dpi_aware: bool) -> EventsLoop {
+    pub fn with_dpi_awareness(dpi_aware: bool) -> EventLoop {
         struct InitData {
             thread_msg_target: HWND,
         }
@@ -152,7 +152,7 @@ impl EventsLoop {
                                  .and_then(|s| s.panic_error.take())
                         );
                         if let Some(panic_payload) = panic_payload_opt {
-                            panic_sender.send(EventsLoopEvent::Panic(panic_payload)).unwrap();
+                            panic_sender.send(EventLoopEvent::Panic(panic_payload)).unwrap();
                         };
 
                         // Only happens if the message is `WM_QUIT`.
@@ -175,7 +175,7 @@ impl EventsLoop {
             processthreadsapi::GetThreadId(handle)
         };
 
-        EventsLoop {
+        EventLoop {
             thread_msg_target,
             thread_id,
             receiver: rx,
@@ -188,8 +188,8 @@ impl EventsLoop {
     {
         loop {
             let event = match self.receiver.try_recv() {
-                Ok(EventsLoopEvent::WinitEvent(e)) => e,
-                Ok(EventsLoopEvent::Panic(panic)) => {
+                Ok(EventLoopEvent::WinitEvent(e)) => e,
+                Ok(EventLoopEvent::Panic(panic)) => {
                     eprintln!("resuming child thread unwind at: {:?}", Backtrace::new());
                     panic::resume_unwind(panic)
                 },
@@ -205,8 +205,8 @@ impl EventsLoop {
     {
         loop {
             let event = match self.receiver.recv() {
-                Ok(EventsLoopEvent::WinitEvent(e)) => e,
-                Ok(EventsLoopEvent::Panic(panic)) => {
+                Ok(EventLoopEvent::WinitEvent(e)) => e,
+                Ok(EventLoopEvent::Panic(panic)) => {
                     eprintln!("resuming child thread unwind at: {:?}", Backtrace::new());
                     panic::resume_unwind(panic)
                 },
@@ -221,8 +221,8 @@ impl EventsLoop {
         }
     }
 
-    pub fn create_proxy(&self) -> EventsLoopProxy {
-        EventsLoopProxy {
+    pub fn create_proxy(&self) -> EventLoopProxy {
+        EventLoopProxy {
             thread_id: self.thread_id,
             thread_msg_target: self.thread_msg_target,
             sender: self.sender.clone(),
@@ -243,7 +243,7 @@ impl EventsLoop {
     }
 }
 
-impl Drop for EventsLoop {
+impl Drop for EventLoop {
     fn drop(&mut self) {
         unsafe {
             // Posting `WM_QUIT` will cause `GetMessage` to stop.
@@ -253,18 +253,18 @@ impl Drop for EventsLoop {
 }
 
 #[derive(Clone)]
-pub struct EventsLoopProxy {
+pub struct EventLoopProxy {
     thread_id: DWORD,
     thread_msg_target: HWND,
-    sender: mpsc::Sender<EventsLoopEvent>,
+    sender: mpsc::Sender<EventLoopEvent>,
 }
 
-unsafe impl Send for EventsLoopProxy {}
-unsafe impl Sync for EventsLoopProxy {}
+unsafe impl Send for EventLoopProxy {}
+unsafe impl Sync for EventLoopProxy {}
 
-impl EventsLoopProxy {
-    pub fn wakeup(&self) -> Result<(), EventsLoopClosed> {
-        self.sender.send(EventsLoopEvent::WinitEvent(Event::Awakened)).map_err(|_| EventsLoopClosed)
+impl EventLoopProxy {
+    pub fn wakeup(&self) -> Result<(), EventLoopClosed> {
+        self.sender.send(EventLoopEvent::WinitEvent(Event::Awakened)).map_err(|_| EventLoopClosed)
     }
 
     /// Executes a function in the background thread.
@@ -392,7 +392,7 @@ fn thread_event_target_window() -> HWND {
 // in a thread-local variable.
 thread_local!(static CONTEXT_STASH: RefCell<Option<ThreadLocalData>> = RefCell::new(None));
 struct ThreadLocalData {
-    sender: mpsc::Sender<EventsLoopEvent>,
+    sender: mpsc::Sender<EventLoopEvent>,
     windows: HashMap<HWND, Arc<Mutex<WindowState>>>,
     file_drop_handlers: HashMap<HWND, FileDropHandler>, // Each window has its own drop handler.
     mouse_buttons_down: u32,
@@ -405,7 +405,7 @@ pub fn send_event(event: Event) {
     CONTEXT_STASH.with(|context_stash| {
         let context_stash = context_stash.borrow();
 
-        let _ = context_stash.as_ref().unwrap().sender.send(EventsLoopEvent::WinitEvent(event));   // Ignoring if closed
+        let _ = context_stash.as_ref().unwrap().sender.send(EventLoopEvent::WinitEvent(event));   // Ignoring if closed
     });
 }
 
@@ -521,7 +521,7 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_CLOSE => {
-            use events::WindowEvent::CloseRequested;
+            use event::WindowEvent::CloseRequested;
             send_event(Event::WindowEvent {
                 window_id: SuperWindowId(WindowId(window)),
                 event: CloseRequested
@@ -530,7 +530,7 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_DESTROY => {
-            use events::WindowEvent::Destroyed;
+            use event::WindowEvent::Destroyed;
             CONTEXT_STASH.with(|context_stash| {
                 let mut context_stash = context_stash.borrow_mut();
                 ole2::RevokeDragDrop(window);
@@ -546,7 +546,7 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_PAINT => {
-            use events::WindowEvent::Refresh;
+            use event::WindowEvent::Refresh;
             send_event(Event::WindowEvent {
                 window_id: SuperWindowId(WindowId(window)),
                 event: Refresh,
@@ -556,7 +556,7 @@ unsafe fn callback_inner(
 
         // WM_MOVE supplies client area positions, so we send Moved here instead.
         winuser::WM_WINDOWPOSCHANGED => {
-            use events::WindowEvent::Moved;
+            use event::WindowEvent::Moved;
 
             let windowpos = lparam as *const winuser::WINDOWPOS;
             if (*windowpos).flags & winuser::SWP_NOMOVE != winuser::SWP_NOMOVE {
@@ -576,7 +576,7 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_SIZE => {
-            use events::WindowEvent::Resized;
+            use event::WindowEvent::Resized;
             let w = LOWORD(lparam as DWORD) as u32;
             let h = HIWORD(lparam as DWORD) as u32;
 
@@ -603,14 +603,14 @@ unsafe fn callback_inner(
                     }
                 }
 
-                cstash.sender.send(EventsLoopEvent::WinitEvent(event)).ok();
+                cstash.sender.send(EventLoopEvent::WinitEvent(event)).ok();
             });
             0
         },
 
         winuser::WM_CHAR => {
             use std::mem;
-            use events::WindowEvent::ReceivedCharacter;
+            use event::WindowEvent::ReceivedCharacter;
             let chr: char = mem::transmute(wparam as u32);
             send_event(Event::WindowEvent {
                 window_id: SuperWindowId(WindowId(window)),
@@ -628,7 +628,7 @@ unsafe fn callback_inner(
         }
 
         winuser::WM_MOUSEMOVE => {
-            use events::WindowEvent::{CursorEntered, CursorMoved};
+            use event::WindowEvent::{CursorEntered, CursorMoved};
             let x = windowsx::GET_X_LPARAM(lparam);
             let y = windowsx::GET_Y_LPARAM(lparam);
 
@@ -675,7 +675,7 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_MOUSELEAVE => {
-            use events::WindowEvent::CursorLeft;
+            use event::WindowEvent::CursorLeft;
 
             CONTEXT_STASH.with(|context_stash| {
                 let mut context_stash = context_stash.borrow_mut();
@@ -696,8 +696,8 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_MOUSEWHEEL => {
-            use events::MouseScrollDelta::LineDelta;
-            use events::TouchPhase;
+            use event::MouseScrollDelta::LineDelta;
+            use event::TouchPhase;
 
             let value = (wparam >> 16) as i16;
             let value = value as i32;
@@ -712,8 +712,8 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_KEYDOWN | winuser::WM_SYSKEYDOWN => {
-            use events::ElementState::Pressed;
-            use events::VirtualKeyCode;
+            use event::ElementState::Pressed;
+            use event::VirtualKeyCode;
             if msg == winuser::WM_SYSKEYDOWN && wparam as i32 == winuser::VK_F4 {
                 winuser::DefWindowProcW(window, msg, wparam, lparam)
             } else {
@@ -744,7 +744,7 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_KEYUP | winuser::WM_SYSKEYUP => {
-            use events::ElementState::Released;
+            use event::ElementState::Released;
             if let Some((scancode, vkey)) = process_key_params(wparam, lparam) {
                 send_event(Event::WindowEvent {
                     window_id: SuperWindowId(WindowId(window)),
@@ -763,9 +763,9 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_LBUTTONDOWN => {
-            use events::WindowEvent::MouseInput;
-            use events::MouseButton::Left;
-            use events::ElementState::Pressed;
+            use event::WindowEvent::MouseInput;
+            use event::MouseButton::Left;
+            use event::ElementState::Pressed;
 
             capture_mouse(window);
 
@@ -777,9 +777,9 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_LBUTTONUP => {
-            use events::WindowEvent::MouseInput;
-            use events::MouseButton::Left;
-            use events::ElementState::Released;
+            use event::WindowEvent::MouseInput;
+            use event::MouseButton::Left;
+            use event::ElementState::Released;
 
             release_mouse();
 
@@ -791,9 +791,9 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_RBUTTONDOWN => {
-            use events::WindowEvent::MouseInput;
-            use events::MouseButton::Right;
-            use events::ElementState::Pressed;
+            use event::WindowEvent::MouseInput;
+            use event::MouseButton::Right;
+            use event::ElementState::Pressed;
 
             capture_mouse(window);
 
@@ -805,9 +805,9 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_RBUTTONUP => {
-            use events::WindowEvent::MouseInput;
-            use events::MouseButton::Right;
-            use events::ElementState::Released;
+            use event::WindowEvent::MouseInput;
+            use event::MouseButton::Right;
+            use event::ElementState::Released;
 
             release_mouse();
 
@@ -819,9 +819,9 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_MBUTTONDOWN => {
-            use events::WindowEvent::MouseInput;
-            use events::MouseButton::Middle;
-            use events::ElementState::Pressed;
+            use event::WindowEvent::MouseInput;
+            use event::MouseButton::Middle;
+            use event::ElementState::Pressed;
 
             capture_mouse(window);
 
@@ -833,9 +833,9 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_MBUTTONUP => {
-            use events::WindowEvent::MouseInput;
-            use events::MouseButton::Middle;
-            use events::ElementState::Released;
+            use event::WindowEvent::MouseInput;
+            use event::MouseButton::Middle;
+            use event::ElementState::Released;
 
             release_mouse();
 
@@ -847,9 +847,9 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_XBUTTONDOWN => {
-            use events::WindowEvent::MouseInput;
-            use events::MouseButton::Other;
-            use events::ElementState::Pressed;
+            use event::WindowEvent::MouseInput;
+            use event::MouseButton::Other;
+            use event::ElementState::Pressed;
             let xbutton = winuser::GET_XBUTTON_WPARAM(wparam);
 
             capture_mouse(window);
@@ -862,9 +862,9 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_XBUTTONUP => {
-            use events::WindowEvent::MouseInput;
-            use events::MouseButton::Other;
-            use events::ElementState::Released;
+            use event::WindowEvent::MouseInput;
+            use event::MouseButton::Other;
+            use event::ElementState::Released;
             let xbutton = winuser::GET_XBUTTON_WPARAM(wparam);
 
             release_mouse();
@@ -892,9 +892,9 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_INPUT => {
-            use events::DeviceEvent::{Motion, MouseMotion, MouseWheel, Button, Key};
-            use events::MouseScrollDelta::LineDelta;
-            use events::ElementState::{Pressed, Released};
+            use event::DeviceEvent::{Motion, MouseMotion, MouseWheel, Button, Key};
+            use event::MouseScrollDelta::LineDelta;
+            use event::ElementState::{Pressed, Released};
 
             if let Some(data) = get_raw_input_data(lparam as _) {
                 let device_id = wrap_device_id(data.header.hDevice as _);
@@ -1036,7 +1036,7 @@ unsafe fn callback_inner(
         }
 
         winuser::WM_SETFOCUS => {
-            use events::WindowEvent::{Focused, CursorMoved};
+            use event::WindowEvent::{Focused, CursorMoved};
             send_event(Event::WindowEvent {
                 window_id: SuperWindowId(WindowId(window)),
                 event: Focused(true)
@@ -1056,7 +1056,7 @@ unsafe fn callback_inner(
         },
 
         winuser::WM_KILLFOCUS => {
-            use events::WindowEvent::Focused;
+            use event::WindowEvent::Focused;
             send_event(Event::WindowEvent {
                 window_id: SuperWindowId(WindowId(window)),
                 event: Focused(false)
@@ -1132,7 +1132,7 @@ unsafe fn callback_inner(
         // Only sent on Windows 8.1 or newer. On Windows 7 and older user has to log out to change
         // DPI, therefore all applications are closed while DPI is changing.
         winuser::WM_DPICHANGED => {
-            use events::WindowEvent::HiDpiFactorChanged;
+            use event::WindowEvent::HiDpiFactorChanged;
 
             // This message actually provides two DPI values - x and y. However MSDN says that
             // "you only need to use either the X-axis or the Y-axis value when scaling your
@@ -1182,7 +1182,7 @@ unsafe fn callback_inner(
                 winuser::DestroyWindow(window);
                 0
             } else if msg == *INITIAL_DPI_MSG_ID {
-                use events::WindowEvent::HiDpiFactorChanged;
+                use event::WindowEvent::HiDpiFactorChanged;
                 let scale_factor = dpi_to_scale_factor(wparam as u32);
                 send_event(Event::WindowEvent {
                     window_id: SuperWindowId(WindowId(window)),

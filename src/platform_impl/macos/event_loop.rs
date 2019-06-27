@@ -1,7 +1,7 @@
-use {events_loop::ControlFlow, events_loop::EventsLoopClosed};
+use {event_loop::ControlFlow, event_loop::EventLoopClosed};
 use cocoa::{self, appkit, foundation};
 use cocoa::appkit::{NSApplication, NSEvent, NSEventMask, NSEventModifierFlags, NSEventPhase, NSView, NSWindow};
-use events::{self, ElementState, Event, TouchPhase, WindowEvent, DeviceEvent, ModifiersState, KeyboardInput};
+use event::{self, ElementState, Event, TouchPhase, WindowEvent, DeviceEvent, ModifiersState, KeyboardInput};
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex, Weak};
 use super::window::Window2;
@@ -9,12 +9,12 @@ use std;
 use std::os::raw::*;
 use super::DeviceId;
 
-pub struct EventsLoop {
+pub struct EventLoop {
     modifiers: Modifiers,
     pub shared: Arc<Shared>,
 }
 
-// State shared between the `EventsLoop` and its registered windows.
+// State shared between the `EventLoop` and its registered windows.
 pub struct Shared {
     pub windows: Mutex<Vec<Weak<Window2>>>,
     pub pending_events: Mutex<VecDeque<Event>>,
@@ -42,7 +42,7 @@ struct Modifiers {
 // Wrapping the user callback in a type allows us to:
 //
 // - ensure the callback pointer is never accidentally cloned
-// - ensure that only the `EventsLoop` can `store` and `drop` the callback pointer
+// - ensure that only the `EventLoop` can `store` and `drop` the callback pointer
 // - Share access to the user callback with the NSWindow callbacks.
 pub struct UserCallback {
     mutex: Mutex<Option<*mut FnMut(Event)>>,
@@ -160,17 +160,17 @@ impl UserCallback {
 }
 
 
-impl EventsLoop {
+impl EventLoop {
 
     pub fn new() -> Self {
         // Mark this thread as the main thread of the Cocoa event system.
         //
         // This must be done before any worker threads get a chance to call it
-        // (e.g., via `EventsLoopProxy::wakeup()`), causing a wrong thread to be
+        // (e.g., via `EventLoopProxy::wakeup()`), causing a wrong thread to be
         // marked as the main thread.
         unsafe { appkit::NSApp(); }
 
-        EventsLoop {
+        EventLoop {
             shared: Arc::new(Shared::new()),
             modifiers: Modifiers::new(),
         }
@@ -458,7 +458,7 @@ impl EventsLoop {
                     return None;
                 }
 
-                use events::MouseScrollDelta::{LineDelta, PixelDelta};
+                use event::MouseScrollDelta::{LineDelta, PixelDelta};
                 let delta = if ns_event.hasPreciseScrollingDeltas() == cocoa::base::YES {
                     PixelDelta((
                         ns_event.scrollingDeltaX() as f64,
@@ -521,7 +521,7 @@ impl EventsLoop {
 }
 
 impl Proxy {
-    pub fn wakeup(&self) -> Result<(), EventsLoopClosed> {
+    pub fn wakeup(&self) -> Result<(), EventLoopClosed> {
         // Awaken the event loop by triggering `NSApplicationActivatedEventType`.
         unsafe {
             let pool = foundation::NSAutoreleasePool::new(cocoa::base::nil);
@@ -544,152 +544,152 @@ impl Proxy {
     }
 }
 
-pub fn to_virtual_key_code(code: c_ushort) -> Option<events::VirtualKeyCode> {
+pub fn to_virtual_key_code(code: c_ushort) -> Option<event::VirtualKeyCode> {
     Some(match code {
-        0x00 => events::VirtualKeyCode::A,
-        0x01 => events::VirtualKeyCode::S,
-        0x02 => events::VirtualKeyCode::D,
-        0x03 => events::VirtualKeyCode::F,
-        0x04 => events::VirtualKeyCode::H,
-        0x05 => events::VirtualKeyCode::G,
-        0x06 => events::VirtualKeyCode::Z,
-        0x07 => events::VirtualKeyCode::X,
-        0x08 => events::VirtualKeyCode::C,
-        0x09 => events::VirtualKeyCode::V,
+        0x00 => event::VirtualKeyCode::A,
+        0x01 => event::VirtualKeyCode::S,
+        0x02 => event::VirtualKeyCode::D,
+        0x03 => event::VirtualKeyCode::F,
+        0x04 => event::VirtualKeyCode::H,
+        0x05 => event::VirtualKeyCode::G,
+        0x06 => event::VirtualKeyCode::Z,
+        0x07 => event::VirtualKeyCode::X,
+        0x08 => event::VirtualKeyCode::C,
+        0x09 => event::VirtualKeyCode::V,
         //0x0a => World 1,
-        0x0b => events::VirtualKeyCode::B,
-        0x0c => events::VirtualKeyCode::Q,
-        0x0d => events::VirtualKeyCode::W,
-        0x0e => events::VirtualKeyCode::E,
-        0x0f => events::VirtualKeyCode::R,
-        0x10 => events::VirtualKeyCode::Y,
-        0x11 => events::VirtualKeyCode::T,
-        0x12 => events::VirtualKeyCode::Key1,
-        0x13 => events::VirtualKeyCode::Key2,
-        0x14 => events::VirtualKeyCode::Key3,
-        0x15 => events::VirtualKeyCode::Key4,
-        0x16 => events::VirtualKeyCode::Key6,
-        0x17 => events::VirtualKeyCode::Key5,
-        0x18 => events::VirtualKeyCode::Equals,
-        0x19 => events::VirtualKeyCode::Key9,
-        0x1a => events::VirtualKeyCode::Key7,
-        0x1b => events::VirtualKeyCode::Minus,
-        0x1c => events::VirtualKeyCode::Key8,
-        0x1d => events::VirtualKeyCode::Key0,
-        0x1e => events::VirtualKeyCode::RBracket,
-        0x1f => events::VirtualKeyCode::O,
-        0x20 => events::VirtualKeyCode::U,
-        0x21 => events::VirtualKeyCode::LBracket,
-        0x22 => events::VirtualKeyCode::I,
-        0x23 => events::VirtualKeyCode::P,
-        0x24 => events::VirtualKeyCode::Return,
-        0x25 => events::VirtualKeyCode::L,
-        0x26 => events::VirtualKeyCode::J,
-        0x27 => events::VirtualKeyCode::Apostrophe,
-        0x28 => events::VirtualKeyCode::K,
-        0x29 => events::VirtualKeyCode::Semicolon,
-        0x2a => events::VirtualKeyCode::Backslash,
-        0x2b => events::VirtualKeyCode::Comma,
-        0x2c => events::VirtualKeyCode::Slash,
-        0x2d => events::VirtualKeyCode::N,
-        0x2e => events::VirtualKeyCode::M,
-        0x2f => events::VirtualKeyCode::Period,
-        0x30 => events::VirtualKeyCode::Tab,
-        0x31 => events::VirtualKeyCode::Space,
-        0x32 => events::VirtualKeyCode::Grave,
-        0x33 => events::VirtualKeyCode::Back,
+        0x0b => event::VirtualKeyCode::B,
+        0x0c => event::VirtualKeyCode::Q,
+        0x0d => event::VirtualKeyCode::W,
+        0x0e => event::VirtualKeyCode::E,
+        0x0f => event::VirtualKeyCode::R,
+        0x10 => event::VirtualKeyCode::Y,
+        0x11 => event::VirtualKeyCode::T,
+        0x12 => event::VirtualKeyCode::Key1,
+        0x13 => event::VirtualKeyCode::Key2,
+        0x14 => event::VirtualKeyCode::Key3,
+        0x15 => event::VirtualKeyCode::Key4,
+        0x16 => event::VirtualKeyCode::Key6,
+        0x17 => event::VirtualKeyCode::Key5,
+        0x18 => event::VirtualKeyCode::Equals,
+        0x19 => event::VirtualKeyCode::Key9,
+        0x1a => event::VirtualKeyCode::Key7,
+        0x1b => event::VirtualKeyCode::Minus,
+        0x1c => event::VirtualKeyCode::Key8,
+        0x1d => event::VirtualKeyCode::Key0,
+        0x1e => event::VirtualKeyCode::RBracket,
+        0x1f => event::VirtualKeyCode::O,
+        0x20 => event::VirtualKeyCode::U,
+        0x21 => event::VirtualKeyCode::LBracket,
+        0x22 => event::VirtualKeyCode::I,
+        0x23 => event::VirtualKeyCode::P,
+        0x24 => event::VirtualKeyCode::Return,
+        0x25 => event::VirtualKeyCode::L,
+        0x26 => event::VirtualKeyCode::J,
+        0x27 => event::VirtualKeyCode::Apostrophe,
+        0x28 => event::VirtualKeyCode::K,
+        0x29 => event::VirtualKeyCode::Semicolon,
+        0x2a => event::VirtualKeyCode::Backslash,
+        0x2b => event::VirtualKeyCode::Comma,
+        0x2c => event::VirtualKeyCode::Slash,
+        0x2d => event::VirtualKeyCode::N,
+        0x2e => event::VirtualKeyCode::M,
+        0x2f => event::VirtualKeyCode::Period,
+        0x30 => event::VirtualKeyCode::Tab,
+        0x31 => event::VirtualKeyCode::Space,
+        0x32 => event::VirtualKeyCode::Grave,
+        0x33 => event::VirtualKeyCode::Back,
         //0x34 => unkown,
-        0x35 => events::VirtualKeyCode::Escape,
-        0x36 => events::VirtualKeyCode::LWin,
-        0x37 => events::VirtualKeyCode::RWin,
-        0x38 => events::VirtualKeyCode::LShift,
+        0x35 => event::VirtualKeyCode::Escape,
+        0x36 => event::VirtualKeyCode::LWin,
+        0x37 => event::VirtualKeyCode::RWin,
+        0x38 => event::VirtualKeyCode::LShift,
         //0x39 => Caps lock,
-        0x3a => events::VirtualKeyCode::LAlt,
-        0x3b => events::VirtualKeyCode::LControl,
-        0x3c => events::VirtualKeyCode::RShift,
-        0x3d => events::VirtualKeyCode::RAlt,
-        0x3e => events::VirtualKeyCode::RControl,
+        0x3a => event::VirtualKeyCode::LAlt,
+        0x3b => event::VirtualKeyCode::LControl,
+        0x3c => event::VirtualKeyCode::RShift,
+        0x3d => event::VirtualKeyCode::RAlt,
+        0x3e => event::VirtualKeyCode::RControl,
         //0x3f => Fn key,
-        0x40 => events::VirtualKeyCode::F17,
-        0x41 => events::VirtualKeyCode::Decimal,
+        0x40 => event::VirtualKeyCode::F17,
+        0x41 => event::VirtualKeyCode::Decimal,
         //0x42 -> unkown,
-        0x43 => events::VirtualKeyCode::Multiply,
+        0x43 => event::VirtualKeyCode::Multiply,
         //0x44 => unkown,
-        0x45 => events::VirtualKeyCode::Add,
+        0x45 => event::VirtualKeyCode::Add,
         //0x46 => unkown,
-        0x47 => events::VirtualKeyCode::Numlock,
+        0x47 => event::VirtualKeyCode::Numlock,
         //0x48 => KeypadClear,
-        0x49 => events::VirtualKeyCode::VolumeUp,
-        0x4a => events::VirtualKeyCode::VolumeDown,
-        0x4b => events::VirtualKeyCode::Divide,
-        0x4c => events::VirtualKeyCode::NumpadEnter,
+        0x49 => event::VirtualKeyCode::VolumeUp,
+        0x4a => event::VirtualKeyCode::VolumeDown,
+        0x4b => event::VirtualKeyCode::Divide,
+        0x4c => event::VirtualKeyCode::NumpadEnter,
         //0x4d => unkown,
-        0x4e => events::VirtualKeyCode::Subtract,
-        0x4f => events::VirtualKeyCode::F18,
-        0x50 => events::VirtualKeyCode::F19,
-        0x51 => events::VirtualKeyCode::NumpadEquals,
-        0x52 => events::VirtualKeyCode::Numpad0,
-        0x53 => events::VirtualKeyCode::Numpad1,
-        0x54 => events::VirtualKeyCode::Numpad2,
-        0x55 => events::VirtualKeyCode::Numpad3,
-        0x56 => events::VirtualKeyCode::Numpad4,
-        0x57 => events::VirtualKeyCode::Numpad5,
-        0x58 => events::VirtualKeyCode::Numpad6,
-        0x59 => events::VirtualKeyCode::Numpad7,
-        0x5a => events::VirtualKeyCode::F20,
-        0x5b => events::VirtualKeyCode::Numpad8,
-        0x5c => events::VirtualKeyCode::Numpad9,
-        0x5d => events::VirtualKeyCode::Yen,
+        0x4e => event::VirtualKeyCode::Subtract,
+        0x4f => event::VirtualKeyCode::F18,
+        0x50 => event::VirtualKeyCode::F19,
+        0x51 => event::VirtualKeyCode::NumpadEquals,
+        0x52 => event::VirtualKeyCode::Numpad0,
+        0x53 => event::VirtualKeyCode::Numpad1,
+        0x54 => event::VirtualKeyCode::Numpad2,
+        0x55 => event::VirtualKeyCode::Numpad3,
+        0x56 => event::VirtualKeyCode::Numpad4,
+        0x57 => event::VirtualKeyCode::Numpad5,
+        0x58 => event::VirtualKeyCode::Numpad6,
+        0x59 => event::VirtualKeyCode::Numpad7,
+        0x5a => event::VirtualKeyCode::F20,
+        0x5b => event::VirtualKeyCode::Numpad8,
+        0x5c => event::VirtualKeyCode::Numpad9,
+        0x5d => event::VirtualKeyCode::Yen,
         //0x5e => JIS Ro,
         //0x5f => unkown,
-        0x60 => events::VirtualKeyCode::F5,
-        0x61 => events::VirtualKeyCode::F6,
-        0x62 => events::VirtualKeyCode::F7,
-        0x63 => events::VirtualKeyCode::F3,
-        0x64 => events::VirtualKeyCode::F8,
-        0x65 => events::VirtualKeyCode::F9,
+        0x60 => event::VirtualKeyCode::F5,
+        0x61 => event::VirtualKeyCode::F6,
+        0x62 => event::VirtualKeyCode::F7,
+        0x63 => event::VirtualKeyCode::F3,
+        0x64 => event::VirtualKeyCode::F8,
+        0x65 => event::VirtualKeyCode::F9,
         //0x66 => JIS Eisuu (macOS),
-        0x67 => events::VirtualKeyCode::F11,
+        0x67 => event::VirtualKeyCode::F11,
         //0x68 => JIS Kana (macOS),
-        0x69 => events::VirtualKeyCode::F13,
-        0x6a => events::VirtualKeyCode::F16,
-        0x6b => events::VirtualKeyCode::F14,
+        0x69 => event::VirtualKeyCode::F13,
+        0x6a => event::VirtualKeyCode::F16,
+        0x6b => event::VirtualKeyCode::F14,
         //0x6c => unkown,
-        0x6d => events::VirtualKeyCode::F10,
+        0x6d => event::VirtualKeyCode::F10,
         //0x6e => unkown,
-        0x6f => events::VirtualKeyCode::F12,
+        0x6f => event::VirtualKeyCode::F12,
         //0x70 => unkown,
-        0x71 => events::VirtualKeyCode::F15,
-        0x72 => events::VirtualKeyCode::Insert,
-        0x73 => events::VirtualKeyCode::Home,
-        0x74 => events::VirtualKeyCode::PageUp,
-        0x75 => events::VirtualKeyCode::Delete,
-        0x76 => events::VirtualKeyCode::F4,
-        0x77 => events::VirtualKeyCode::End,
-        0x78 => events::VirtualKeyCode::F2,
-        0x79 => events::VirtualKeyCode::PageDown,
-        0x7a => events::VirtualKeyCode::F1,
-        0x7b => events::VirtualKeyCode::Left,
-        0x7c => events::VirtualKeyCode::Right,
-        0x7d => events::VirtualKeyCode::Down,
-        0x7e => events::VirtualKeyCode::Up,
+        0x71 => event::VirtualKeyCode::F15,
+        0x72 => event::VirtualKeyCode::Insert,
+        0x73 => event::VirtualKeyCode::Home,
+        0x74 => event::VirtualKeyCode::PageUp,
+        0x75 => event::VirtualKeyCode::Delete,
+        0x76 => event::VirtualKeyCode::F4,
+        0x77 => event::VirtualKeyCode::End,
+        0x78 => event::VirtualKeyCode::F2,
+        0x79 => event::VirtualKeyCode::PageDown,
+        0x7a => event::VirtualKeyCode::F1,
+        0x7b => event::VirtualKeyCode::Left,
+        0x7c => event::VirtualKeyCode::Right,
+        0x7d => event::VirtualKeyCode::Down,
+        0x7e => event::VirtualKeyCode::Up,
         //0x7f =>  unkown,
 
-        0xa => events::VirtualKeyCode::Caret,
+        0xa => event::VirtualKeyCode::Caret,
         _ => return None,
     })
 }
 
 pub fn check_additional_virtual_key_codes(
     s: &Option<String>
-) -> Option<events::VirtualKeyCode> {
+) -> Option<event::VirtualKeyCode> {
     if let &Some(ref s) = s {
         if let Some(ch) = s.encode_utf16().next() {
             return Some(match ch {
-                0xf718 => events::VirtualKeyCode::F21,
-                0xf719 => events::VirtualKeyCode::F22,
-                0xf71a => events::VirtualKeyCode::F23,
-                0xf71b => events::VirtualKeyCode::F24,
+                0xf718 => event::VirtualKeyCode::F21,
+                0xf719 => event::VirtualKeyCode::F22,
+                0xf71a => event::VirtualKeyCode::F23,
+                0xf71b => event::VirtualKeyCode::F24,
                 _ => return None,
             })
         }

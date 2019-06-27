@@ -81,22 +81,22 @@ pub fn set_main_loop_callback<F>(callback : F) where F : FnMut() {
 }
 
 #[derive(Clone)]
-pub struct EventsLoopProxy;
+pub struct EventLoopProxy;
 
-impl EventsLoopProxy {
-    pub fn wakeup(&self) -> Result<(), ::EventsLoopClosed> {
+impl EventLoopProxy {
+    pub fn wakeup(&self) -> Result<(), ::EventLoopClosed> {
         unimplemented!()
     }
 }
 
-pub struct EventsLoop {
+pub struct EventLoop {
     window: Mutex<Option<Arc<Window2>>>,
     interrupted: AtomicBool,
 }
 
-impl EventsLoop {
-    pub fn new() -> EventsLoop {
-        EventsLoop {
+impl EventLoop {
+    pub fn new() -> EventLoop {
+        EventLoop {
             window: Mutex::new(None),
             interrupted: AtomicBool::new(false),
         }
@@ -108,7 +108,7 @@ impl EventsLoop {
     }
 
     #[inline]
-    pub fn create_proxy(&self) -> EventsLoopProxy {
+    pub fn create_proxy(&self) -> EventLoopProxy {
         unimplemented!()
     }
 
@@ -378,11 +378,11 @@ fn em_try(res: ffi::EMSCRIPTEN_RESULT) -> Result<(), String> {
 }
 
 impl Window {
-    pub fn new(events_loop: &EventsLoop, attribs: ::WindowAttributes,
+    pub fn new(event_loop: &EventLoop, attribs: ::WindowAttributes,
                _pl_attribs: PlatformSpecificWindowBuilderAttributes)
         -> Result<Window, ::CreationError>
     {
-        if events_loop.window.lock().unwrap().is_some() {
+        if event_loop.window.lock().unwrap().is_some() {
             return Err(::CreationError::OsError("Cannot create another window".to_owned()));
         }
 
@@ -431,7 +431,7 @@ impl Window {
             window.set_inner_size(size);
         }
 
-        *events_loop.window.lock().unwrap() = Some(window.window.clone());
+        *event_loop.window.lock().unwrap() = Some(window.window.clone());
         Ok(window)
     }
 
@@ -625,9 +625,9 @@ impl Window {
 
 impl Drop for Window {
     fn drop(&mut self) {
-        // Delete window from events_loop
+        // Delete window from event_loop
         // TODO: ?
-        /*if let Some(ev) = self.events_loop.upgrade() {
+        /*if let Some(ev) = self.event_loop.upgrade() {
             let _ = ev.window.lock().unwrap().take().unwrap();
         }*/
 

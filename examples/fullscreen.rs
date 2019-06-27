@@ -1,10 +1,10 @@
 extern crate winit;
 
 use std::io::{self, Write};
-use winit::{events_loop::ControlFlow, Event, WindowEvent};
+use winit::{event_loop::ControlFlow, Event, WindowEvent};
 
 fn main() {
-    let mut events_loop = winit::events_loop::EventsLoop::new();
+    let mut event_loop = winit::event_loop::EventLoop::new();
 
     #[cfg(target_os = "macos")]
     let mut macos_use_simple_fullscreen = false;
@@ -26,14 +26,14 @@ fn main() {
 
             // Prompt for monitor when using native fullscreen
             if !macos_use_simple_fullscreen {
-                Some(prompt_for_monitor(&events_loop))
+                Some(prompt_for_monitor(&event_loop))
             } else {
                 None
             }
         }
 
         #[cfg(not(target_os = "macos"))]
-        Some(prompt_for_monitor(&events_loop))
+        Some(prompt_for_monitor(&event_loop))
     };
 
     let mut is_fullscreen = monitor.is_some();
@@ -43,10 +43,10 @@ fn main() {
     let window = winit::WindowBuilder::new()
         .with_title("Hello world!")
         .with_fullscreen(monitor)
-        .build(&events_loop)
+        .build(&event_loop)
         .unwrap();
 
-    events_loop.run_forever(|event| {
+    event_loop.run_forever(|event| {
         println!("{:?}", event);
 
         match event {
@@ -102,8 +102,8 @@ fn main() {
 }
 
 // Enumerate monitors and prompt user to choose one
-fn prompt_for_monitor(events_loop: &winit::events_loop::EventsLoop) -> winit::MonitorHandle {
-    for (num, monitor) in events_loop.get_available_monitors().enumerate() {
+fn prompt_for_monitor(event_loop: &winit::event_loop::EventLoop) -> winit::MonitorHandle {
+    for (num, monitor) in event_loop.get_available_monitors().enumerate() {
         println!("Monitor #{}: {:?}", num, monitor.get_name());
     }
 
@@ -113,7 +113,7 @@ fn prompt_for_monitor(events_loop: &winit::events_loop::EventsLoop) -> winit::Mo
     let mut num = String::new();
     io::stdin().read_line(&mut num).unwrap();
     let num = num.trim().parse().ok().expect("Please enter a number");
-    let monitor = events_loop.get_available_monitors().nth(num).expect("Please enter a valid ID");
+    let monitor = event_loop.get_available_monitors().nth(num).expect("Please enter a valid ID");
 
     println!("Using {:?}", monitor.get_name());
 
