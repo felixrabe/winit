@@ -30,7 +30,7 @@ use {
 /// });
 /// ```
 pub struct Window {
-    window: platform_impl::Window,
+    pub(crate) window: platform_impl::Window,
 }
 
 impl std::fmt::Debug for Window {
