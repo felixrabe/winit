@@ -84,8 +84,8 @@ pub struct WindowBuilder {
     /// The attributes to use to create the window.
     pub window: WindowAttributes,
 
-    // Platform-specific configuration. Private.
-    platform_specific: platform_impl::PlatformSpecificWindowBuilderAttributes,
+    // Platform-specific configuration.
+    pub(crate) platform_specific: platform_impl::PlatformSpecificWindowBuilderAttributes,
 }
 
 impl std::fmt::Debug for WindowBuilder {
