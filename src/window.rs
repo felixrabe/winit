@@ -65,7 +65,7 @@ pub struct WindowBuilder {
     /// The attributes to use to create the window.
     pub window: WindowAttributes,
 
-    // Platform-specific configuration. Private.
+    // Platform-specific configuration.
     pub(crate) platform_specific: platform_impl::PlatformSpecificWindowBuilderAttributes,
 }
 
