@@ -1,3 +1,8 @@
+use std::collections::vec_deque::IntoIter as VecDequeIter;
+
+use platform_impl;
+use dpi::{PhysicalPosition, PhysicalSize};
+
 /// An iterator for the list of available monitors.
 // Implementation note: we retrieve the list once, then serve each element by one by one.
 // This may change in the future.
