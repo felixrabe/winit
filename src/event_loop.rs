@@ -1,4 +1,5 @@
 //! The `EventLoop` struct and assorted supporting types, including `ControlFlow`.
+use std::{fmt, error};
 
 use platform_impl;
 use event::Event;
@@ -22,8 +23,8 @@ pub struct EventLoop {
     _marker: ::std::marker::PhantomData<*mut ()> // Not Send nor Sync
 }
 
-impl std::fmt::Debug for EventLoop {
-    fn fmt(&self, fmtr: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl fmt::Debug for EventLoop {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         fmtr.pad("EventLoop { .. }")
     }
 }
@@ -108,8 +109,8 @@ pub struct EventLoopProxy {
     event_loop_proxy: platform_impl::EventLoopProxy,
 }
 
-impl std::fmt::Debug for EventLoopProxy {
-    fn fmt(&self, fmtr: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl fmt::Debug for EventLoopProxy {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         fmtr.pad("EventLoopProxy { .. }")
     }
 }
@@ -130,13 +131,13 @@ impl EventLoopProxy {
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct EventLoopClosed;
 
-impl std::fmt::Display for EventLoopClosed {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", std::error::Error::description(self))
+impl fmt::Display for EventLoopClosed {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", error::Error::description(self))
     }
 }
 
-impl std::error::Error for EventLoopClosed {
+impl error::Error for EventLoopClosed {
     fn description(&self) -> &str {
         "Tried to wake up a closed `EventLoop`"
     }
