@@ -41,7 +41,7 @@ use {
     WindowId,
 };
 use CreationError::OsError;
-use os::macos::{ActivationPolicy, WindowExt};
+use platform::macos::{ActivationPolicy, WindowExt};
 use platform_impl::platform::{ffi, util};
 use platform_impl::platform::events_loop::{EventsLoop, Shared};
 use platform_impl::platform::view::{new_view, set_ime_spot};
