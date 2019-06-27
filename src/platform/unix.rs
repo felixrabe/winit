@@ -97,7 +97,7 @@ impl Theme for WaylandThemeObject {
 
 /// Additional methods on `EventLoop` that are specific to Unix.
 pub trait EventLoopExtUnix {
-    /// Builds a new `EventsLoop` that is forced to use X11.
+    /// Builds a new `EventLoop` that is forced to use X11.
     fn new_x11() -> Result<Self, XNotSupported>
         where Self: Sized;
 

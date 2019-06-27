@@ -167,6 +167,7 @@ impl Default for WindowAttributes {
         }
     }
 }
+
 impl WindowBuilder {
     /// Initializes a new `WindowBuilder` with default values.
     #[inline]
