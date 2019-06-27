@@ -15,6 +15,275 @@ use {
     WindowId,
 };
 
+/// Represents a window.
+///
+/// # Example
+///
+/// ```no_run
+/// use winit::{Event, event_loop::EventLoop, Window, WindowEvent, event_loop::ControlFlow};
+///
+/// let mut event_loop = EventLoop::new();
+/// let window = Window::new(&event_loop).unwrap();
+///
+/// event_loop.run_forever(|event| {
+///     match event {
+///         Event::WindowEvent { event: WindowEvent::CloseRequested, .. } => {
+///             ControlFlow::Break
+///         },
+///         _ => ControlFlow::Continue,
+///     }
+/// });
+/// ```
+pub struct Window {
+    window: platform_impl::Window,
+}
+
+impl std::fmt::Debug for Window {
+    fn fmt(&self, fmtr: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmtr.pad("Window { .. }")
+    }
+}
+
+/// Identifier of a window. Unique for each window.
+///
+/// Can be obtained with `window.id()`.
+///
+/// Whenever you receive an event specific to a window, this event contains a `WindowId` which you
+/// can then compare to the ids of your windows.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct WindowId(platform_impl::WindowId);
+
+impl WindowId {
+    /// Returns a dummy `WindowId`, useful for unit testing. The only guarantee made about the return
+    /// value of this function is that it will always be equal to itself and to future values returned
+    /// by this function.  No other guarantees are made. This may be equal to a real `WindowId`.
+    ///
+    /// **Passing this into a winit function will result in undefined behavior.**
+    pub unsafe fn dummy() -> Self {
+        WindowId(platform_impl::WindowId::dummy())
+    }
+}
+
+/// Identifier of an input device.
+///
+/// Whenever you receive an event arising from a particular input device, this event contains a `DeviceId` which
+/// identifies its origin. Note that devices may be virtual (representing an on-screen cursor and keyboard focus) or
+/// physical. Virtual devices typically aggregate inputs from multiple physical devices.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct DeviceId(platform_impl::DeviceId);
+
+impl DeviceId {
+    /// Returns a dummy `DeviceId`, useful for unit testing. The only guarantee made about the return
+    /// value of this function is that it will always be equal to itself and to future values returned
+    /// by this function.  No other guarantees are made. This may be equal to a real `DeviceId`.
+    ///
+    /// **Passing this into a winit function will result in undefined behavior.**
+    pub unsafe fn dummy() -> Self {
+        DeviceId(platform_impl::DeviceId::dummy())
+    }
+}
+
+/// Object that allows you to build windows.
+#[derive(Clone)]
+pub struct WindowBuilder {
+    /// The attributes to use to create the window.
+    pub window: WindowAttributes,
+
+    // Platform-specific configuration. Private.
+    platform_specific: platform_impl::PlatformSpecificWindowBuilderAttributes,
+}
+
+impl std::fmt::Debug for WindowBuilder {
+    fn fmt(&self, fmtr: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmtr.debug_struct("WindowBuilder")
+            .field("window", &self.window)
+            .finish()
+    }
+}
+
+/// Error that can happen while creating a window or a headless renderer.
+#[derive(Debug, Clone)]
+pub enum CreationError {
+    OsError(String),
+    /// TODO: remove this error
+    NotSupported,
+}
+
+impl CreationError {
+    fn to_string(&self) -> &str {
+        match *self {
+            CreationError::OsError(ref text) => &text,
+            CreationError::NotSupported => "Some of the requested attributes are not supported",
+        }
+    }
+}
+
+impl std::fmt::Display for CreationError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        formatter.write_str(self.to_string())
+    }
+}
+
+impl std::error::Error for CreationError {
+    fn description(&self) -> &str {
+        self.to_string()
+    }
+}
+
+/// Describes the appearance of the mouse cursor.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub enum MouseCursor {
+    /// The platform-dependent default cursor.
+    Default,
+    /// A simple crosshair.
+    Crosshair,
+    /// A hand (often used to indicate links in web browsers).
+    Hand,
+    /// Self explanatory.
+    Arrow,
+    /// Indicates something is to be moved.
+    Move,
+    /// Indicates text that may be selected or edited.
+    Text,
+    /// Program busy indicator.
+    Wait,
+    /// Help indicator (often rendered as a "?")
+    Help,
+    /// Progress indicator. Shows that processing is being done. But in contrast
+    /// with "Wait" the user may still interact with the program. Often rendered
+    /// as a spinning beach ball, or an arrow with a watch or hourglass.
+    Progress,
+
+    /// Cursor showing that something cannot be done.
+    NotAllowed,
+    ContextMenu,
+    Cell,
+    VerticalText,
+    Alias,
+    Copy,
+    NoDrop,
+    Grab,
+    Grabbing,
+    AllScroll,
+    ZoomIn,
+    ZoomOut,
+
+    /// Indicate that some edge is to be moved. For example, the 'SeResize' cursor
+    /// is used when the movement starts from the south-east corner of the box.
+    EResize,
+    NResize,
+    NeResize,
+    NwResize,
+    SResize,
+    SeResize,
+    SwResize,
+    WResize,
+    EwResize,
+    NsResize,
+    NeswResize,
+    NwseResize,
+    ColResize,
+    RowResize,
+}
+
+impl Default for MouseCursor {
+    fn default() -> Self {
+        MouseCursor::Default
+    }
+}
+
+/// Attributes to use when creating a window.
+#[derive(Debug, Clone)]
+pub struct WindowAttributes {
+    /// The dimensions of the window. If this is `None`, some platform-specific dimensions will be
+    /// used.
+    ///
+    /// The default is `None`.
+    pub dimensions: Option<LogicalSize>,
+
+    /// The minimum dimensions a window can be, If this is `None`, the window will have no minimum dimensions (aside from reserved).
+    ///
+    /// The default is `None`.
+    pub min_dimensions: Option<LogicalSize>,
+
+    /// The maximum dimensions a window can be, If this is `None`, the maximum will have no maximum or will be set to the primary monitor's dimensions by the platform.
+    ///
+    /// The default is `None`.
+    pub max_dimensions: Option<LogicalSize>,
+
+    /// Whether the window is resizable or not.
+    ///
+    /// The default is `true`.
+    pub resizable: bool,
+
+    /// Whether the window should be set as fullscreen upon creation.
+    ///
+    /// The default is `None`.
+    pub fullscreen: Option<MonitorHandle>,
+
+    /// The title of the window in the title bar.
+    ///
+    /// The default is `"winit window"`.
+    pub title: String,
+
+    /// Whether the window should be maximized upon creation.
+    ///
+    /// The default is `false`.
+    pub maximized: bool,
+
+    /// Whether the window should be immediately visible upon creation.
+    ///
+    /// The default is `true`.
+    pub visible: bool,
+
+    /// Whether the the window should be transparent. If this is true, writing colors
+    /// with alpha values different than `1.0` will produce a transparent window.
+    ///
+    /// The default is `false`.
+    pub transparent: bool,
+
+    /// Whether the window should have borders and bars.
+    ///
+    /// The default is `true`.
+    pub decorations: bool,
+
+    /// Whether the window should always be on top of other windows.
+    ///
+    /// The default is `false`.
+    pub always_on_top: bool,
+
+    /// The window icon.
+    ///
+    /// The default is `None`.
+    pub window_icon: Option<Icon>,
+
+    /// [iOS only] Enable multitouch,
+    /// see [multipleTouchEnabled](https://developer.apple.com/documentation/uikit/uiview/1622519-multipletouchenabled)
+    pub multitouch: bool,
+}
+
+impl Default for WindowAttributes {
+    #[inline]
+    fn default() -> WindowAttributes {
+        WindowAttributes {
+            dimensions: None,
+            min_dimensions: None,
+            max_dimensions: None,
+            resizable: true,
+            title: "winit window".to_owned(),
+            maximized: false,
+            fullscreen: None,
+            visible: true,
+            transparent: false,
+            decorations: true,
+            always_on_top: false,
+            window_icon: None,
+            multitouch: false,
+        }
+    }
+}
+
 impl WindowBuilder {
     /// Initializes a new `WindowBuilder` with default values.
     #[inline]
