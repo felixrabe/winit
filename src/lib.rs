@@ -130,6 +130,7 @@ pub mod event_loop;
 mod icon;
 mod platform_impl;
 pub mod window;
+pub mod monitor;
 
 pub mod platform;
 

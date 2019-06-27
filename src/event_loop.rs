@@ -3,7 +3,7 @@ use std::{fmt, error};
 
 use platform_impl;
 use event::Event;
-use {AvailableMonitorsIter, MonitorHandle};
+use monitor::{AvailableMonitorsIter, MonitorHandle};
 
 /// Provides a way to retrieve events from the system and from the windows that were registered to
 /// the events loop.
