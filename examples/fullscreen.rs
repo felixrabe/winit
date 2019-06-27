@@ -4,7 +4,7 @@ use std::io::{self, Write};
 use winit::{ControlFlow, Event, WindowEvent};
 
 fn main() {
-    let mut events_loop = winit::EventsLoop::new();
+    let mut events_loop = winit::events_loop::EventsLoop::new();
 
     #[cfg(target_os = "macos")]
     let mut macos_use_simple_fullscreen = false;
@@ -102,7 +102,7 @@ fn main() {
 }
 
 // Enumerate monitors and prompt user to choose one
-fn prompt_for_monitor(events_loop: &winit::EventsLoop) -> winit::MonitorId {
+fn prompt_for_monitor(events_loop: &winit::events_loop::EventsLoop) -> winit::MonitorId {
     for (num, monitor) in events_loop.get_available_monitors().enumerate() {
         println!("Monitor #{}: {:?}", num, monitor.get_name());
     }

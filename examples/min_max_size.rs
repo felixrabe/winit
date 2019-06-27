@@ -3,7 +3,7 @@ extern crate winit;
 use winit::dpi::LogicalSize;
 
 fn main() {
-    let mut events_loop = winit::EventsLoop::new();
+    let mut events_loop = winit::events_loop::EventsLoop::new();
 
     let window = winit::WindowBuilder::new()
         .build(&events_loop)
@@ -16,8 +16,8 @@ fn main() {
         println!("{:?}", event);
 
         match event {
-            winit::Event::WindowEvent { event: winit::WindowEvent::CloseRequested, .. } => winit::ControlFlow::Break,
-            _ => winit::ControlFlow::Continue,
+            winit::Event::WindowEvent { event: winit::WindowEvent::CloseRequested, .. } => winit::events_loop::ControlFlow::Break,
+            _ => winit::events_loop::ControlFlow::Continue,
         }
     });
 }

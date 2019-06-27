@@ -1,7 +1,7 @@
 extern crate winit;
 
 fn main() {
-    let mut events_loop = winit::EventsLoop::new();
+    let mut events_loop = winit::events_loop::EventsLoop::new();
 
     let mut resizable = false;
 
@@ -15,7 +15,7 @@ fn main() {
     events_loop.run_forever(|event| {
         match event {
             winit::Event::WindowEvent { event, .. } => match event {
-                winit::WindowEvent::CloseRequested => return winit::ControlFlow::Break,
+                winit::WindowEvent::CloseRequested => return winit::events_loop::ControlFlow::Break,
                 winit::WindowEvent::KeyboardInput {
                     input:
                         winit::KeyboardInput {
@@ -33,6 +33,6 @@ fn main() {
             },
             _ => (),
         };
-        winit::ControlFlow::Continue
+        winit::events_loop::ControlFlow::Continue
     });
 }

@@ -6,7 +6,7 @@
 //! `EventsLoop::new()` function. Example:
 //!
 //! ```no_run
-//! use winit::EventsLoop;
+//! use winit::events_loop::EventsLoop;
 //! let events_loop = EventsLoop::new();
 //! ```
 //!
@@ -36,7 +36,7 @@
 //! ```no_run
 //! use winit::{Event, WindowEvent};
 //! use winit::dpi::LogicalSize;
-//! # use winit::EventsLoop;
+//! # use winit::events_loop::EventsLoop;
 //! # let mut events_loop = EventsLoop::new();
 //!
 //! loop {
@@ -59,7 +59,7 @@
 //!
 //! ```no_run
 //! use winit::{ControlFlow, Event, WindowEvent};
-//! # use winit::EventsLoop;
+//! # use winit::events_loop::EventsLoop;
 //! # let mut events_loop = EventsLoop::new();
 //!
 //! events_loop.run_forever(|event| {
