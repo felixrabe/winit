@@ -1,6 +1,6 @@
 //! The `EventsLoop` struct and assorted supporting types, including `ControlFlow`.
 
-use platform;
+use platform_impl;
 use events::Event;
 use {AvailableMonitorsIter, MonitorId};
 
@@ -18,7 +18,7 @@ use {AvailableMonitorsIter, MonitorId};
 /// `Window` created from this `EventsLoop` _can_ be sent to an other thread, and the
 /// `EventsLoopProxy` allows you to wakeup an `EventsLoop` from an other thread.
 pub struct EventsLoop {
-    pub(crate) events_loop: platform::EventsLoop,
+    pub(crate) events_loop: platform_impl::EventsLoop,
     _marker: ::std::marker::PhantomData<*mut ()> // Not Send nor Sync
 }
 
@@ -49,7 +49,7 @@ impl EventsLoop {
     /// fallback on x11. If this variable is set with any other value, winit will panic.
     pub fn new() -> EventsLoop {
         EventsLoop {
-            events_loop: platform::EventsLoop::new(),
+            events_loop: platform_impl::EventsLoop::new(),
             _marker: ::std::marker::PhantomData,
         }
     }
@@ -105,7 +105,7 @@ impl EventsLoop {
 /// Used to wake up the `EventsLoop` from another thread.
 #[derive(Clone)]
 pub struct EventsLoopProxy {
-    events_loop_proxy: platform::EventsLoopProxy,
+    events_loop_proxy: platform_impl::EventsLoopProxy,
 }
 
 impl std::fmt::Debug for EventsLoopProxy {
