@@ -14,7 +14,7 @@ impl DeviceId {
     }
 }
 
-use {CreationError};
+use window::{CreationError, WindowAttributes};
 
 pub struct Window {
     pub window: Arc<Window2>,
@@ -31,7 +31,7 @@ impl ::std::ops::Deref for Window {
 impl Window {
 
     pub fn new(event_loop: &EventLoop,
-               attributes: ::WindowAttributes,
+               attributes: WindowAttributes,
                pl_attribs: PlatformSpecificWindowBuilderAttributes) -> Result<Self, CreationError>
     {
         let weak_shared = Arc::downgrade(&event_loop.shared);
