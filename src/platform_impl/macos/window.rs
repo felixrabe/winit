@@ -41,7 +41,7 @@ use {
     WindowId,
 };
 use CreationError::OsError;
-use platform::macos::{ActivationPolicy, WindowExt};
+use platform::macos::{ActivationPolicy, WindowExtMacOS};
 use platform_impl::platform::{ffi, util};
 use platform_impl::platform::event_loop::{EventLoop, Shared};
 use platform_impl::platform::view::{new_view, set_ime_spot};
@@ -594,7 +594,7 @@ impl Drop for Window2 {
     }
 }
 
-impl WindowExt for Window2 {
+impl WindowExtMacOS for Window2 {
     #[inline]
     fn get_nswindow(&self) -> *mut c_void {
         *self.window as *mut c_void
@@ -1237,7 +1237,7 @@ impl Window2 {
         // semantically distinct and should only be used when the window is in some way
         // representing a specific file/directory. For instance, Terminal.app uses this for the
         // CWD. Anyway, that should eventually be implemented as
-        // `WindowBuilderExt::with_represented_file` or something, and doesn't have anything to do
+        // `WindowBuilderExtMacOS::with_represented_file` or something, and doesn't have anything to do
         // with `set_window_icon`.
         // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/WinPanel/Tasks/SettingWindowTitle.html
     }
