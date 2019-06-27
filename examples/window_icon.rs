@@ -13,7 +13,7 @@ fn main() {
 
     let icon = load_icon(Path::new(path));
 
-    let mut events_loop = winit::EventsLoop::new();
+    let mut events_loop = winit::events_loop::EventsLoop::new();
 
     let window = winit::WindowBuilder::new()
         .with_title("An iconic window!")
@@ -27,7 +27,7 @@ fn main() {
         if let winit::Event::WindowEvent { event, .. } = event {
             use winit::WindowEvent::*;
             match event {
-                CloseRequested => return winit::ControlFlow::Break,
+                CloseRequested => return winit::events_loop::ControlFlow::Break,
                 DroppedFile(path) => {
                     use image::GenericImageView;
 
@@ -36,7 +36,7 @@ fn main() {
                 _ => (),
             }
         }
-        winit::ControlFlow::Continue
+        winit::events_loop::ControlFlow::Continue
     });
 }
 

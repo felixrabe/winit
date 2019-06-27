@@ -3,7 +3,7 @@ extern crate winit;
 use std::collections::HashMap;
 
 fn main() {
-    let mut events_loop = winit::EventsLoop::new();
+    let mut events_loop = winit::events_loop::EventsLoop::new();
 
     let mut windows = HashMap::new();
     for _ in 0..3 {
@@ -23,11 +23,11 @@ fn main() {
                 windows.remove(&window_id);
 
                 if windows.is_empty() {
-                    return winit::ControlFlow::Break;
+                    return winit::events_loop::ControlFlow::Break;
                 }
             }
             _ => (),
         }
-        winit::ControlFlow::Continue
+        winit::events_loop::ControlFlow::Continue
     })
 }

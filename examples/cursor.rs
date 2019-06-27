@@ -1,9 +1,9 @@
 extern crate winit;
 
-use winit::{Event, ElementState, MouseCursor, WindowEvent, KeyboardInput, ControlFlow};
+use winit::{Event, ElementState, MouseCursor, WindowEvent, KeyboardInput, events_loop::ControlFlow};
 
 fn main() {
-    let mut events_loop = winit::EventsLoop::new();
+    let mut events_loop = winit::events_loop::EventsLoop::new();
 
     let window = winit::WindowBuilder::new().build(&events_loop).unwrap();
     window.set_title("A fantastic window!");
