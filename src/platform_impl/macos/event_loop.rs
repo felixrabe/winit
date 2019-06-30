@@ -53,7 +53,7 @@ impl<T> EventLoop<T> {
 
             let delegate = IdRef::new(msg_send![APP_DELEGATE_CLASS.0, new]);
             let pool = NSAutoreleasePool::new(nil);
-            let _: () = msg_send![app, setDelegate:*delegate];
+            let _: () = msg_send![app, setDelegate: *delegate];
             let _: () = msg_send![pool, drain];
             delegate
         };
