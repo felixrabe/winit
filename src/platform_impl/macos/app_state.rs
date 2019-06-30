@@ -47,6 +47,7 @@ impl<F, T> Debug for EventLoopHandler<F, T> {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter
             .debug_struct("EventLoopHandler")
+            .field("will_exit", &self.will_exit)
             .field("window_target", &self.window_target)
             .finish()
     }
