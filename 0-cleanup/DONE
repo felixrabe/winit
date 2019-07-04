@@ -1,0 +1,55 @@
+DONE
+
+    add-android-ci
+    circleci
+    dev-0.5
+    fix-winapi
+    fix-winapi-0.2
+    forward-porting
+    new-inputs
+    semver
+    wait-next-event
+    win32-build-correctly
+    win32-egl
+    win32-rework
+    windows-libs-update
+
+EXCLUDED OFFICIAL BRANCHES
+
+    dpi-overhaul
+    gamepad-device-events
+    master
+    winit-legacy
+
+EXCLUDED ACTIVE BRANCHES
+
+    device-event-button-mac
+    exclusive-fullscreen
+    exclusive-fullscreen-wip
+    stdweb-eventloop-2
+
+EXCLUDED UNINTERESTING / OTHERWISE MERGED BRANCHES
+
+    cocoa
+    egl
+    fix-ci
+    fix-fullscreen-dimensions
+    fix-mac-multithreaded
+    fix-travis
+    gh-pages
+    platform-specific
+    raw-mouse-mac
+    revert-466-window_resize_mouse_up_fix
+    video-modes
+    video-modes-wip
+    window_resize_mouse_up_fix
+
+CHECKED AGAINST
+
+    $ gb -r --no-merged origin/master | sed s',.*/,,'g | sort | uniq | pbcopy
+
+TIPS
+
+-   To trim repo size: gitgc
+-   Script to clean own mess
+-   Script to clean others' mess
