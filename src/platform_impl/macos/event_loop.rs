@@ -40,6 +40,7 @@ pub struct EventLoop<T: 'static> {
 
 impl<T> EventLoop<T> {
     pub fn new() -> Self {
+        d_macro::d_start();
         let delegate = unsafe {
             if !msg_send![class!(NSThread), isMainThread] {
                 panic!("On macOS, `EventLoop` must be created on the main thread!");
@@ -90,8 +91,11 @@ impl<T> EventLoop<T> {
             let app = NSApp();
             assert_ne!(app, nil);
             AppState::set_callback(callback, self.window_target);
+            { use d_macro::d; d!(); }
             let _: () = msg_send![app, run];
+            { use d_macro::d; d!(); }
             AppState::exit();
+            d_macro::d_end();
             process::exit(0)
         }
     }

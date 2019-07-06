@@ -115,6 +115,7 @@ extern "C" fn control_flow_begin_handler(
     activity: CFRunLoopActivity,
     _: *mut c_void,
 ) {
+    { use d_macro::d; d!("begin"); }
     #[allow(non_upper_case_globals)]
     match activity {
         kCFRunLoopAfterWaiting => {
@@ -134,6 +135,7 @@ extern "C" fn control_flow_end_handler(
     activity: CFRunLoopActivity,
     _: *mut c_void,
 ) {
+    { use d_macro::d; d!("end"); }
     #[allow(non_upper_case_globals)]
     match activity {
         kCFRunLoopBeforeWaiting => {

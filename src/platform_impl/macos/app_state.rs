@@ -209,9 +209,11 @@ impl AppState {
     }
 
     pub fn wakeup() {
+        // { use d_macro::d; d!("wakeup"); }
         if !HANDLER.is_ready() {
             return;
         }
+        // { use d_macro::d; d!("ready"); }
         let start = HANDLER.get_start_time().unwrap();
         let cause = match HANDLER.get_control_flow_and_update_prev() {
             ControlFlow::Poll => StartCause::Poll,
@@ -232,7 +234,10 @@ impl AppState {
                     }
                 }
             }
-            ControlFlow::Exit => StartCause::Poll, //panic!("unexpected `ControlFlow::Exit`"),
+            ControlFlow::Exit => {
+                { use d_macro::d; d!("Exit"); }
+                StartCause::Poll
+            }, //panic!("unexpected `ControlFlow::Exit`"),
         };
         HANDLER.set_in_callback(true);
         HANDLER.handle_nonuser_event(Event::NewEvents(cause));
