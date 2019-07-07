@@ -1,5 +1,9 @@
 language: rust
 
+env:
+  global:
+    - RUSTFLAGS="-D warnings"
+
 matrix:
   include:
     # Linux 32bit
